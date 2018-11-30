@@ -1,0 +1,25 @@
+*.pyc
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+.cache
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+nosetests.xml
+
+.DS_Store
+.idea/*
+.python-version
+
+test.py
+/test
+poetry.lock
+.pytest_cache
