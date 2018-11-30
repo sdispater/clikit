@@ -45,7 +45,7 @@ class AbstractHelp(Component):
         self, layout, argument
     ):  # type: (BlockLayout, Argument) -> None
         description = argument.description
-        name = "<c1>{}</c1>".format(argument.name)
+        name = "<c1><{}></c1>".format(argument.name)
         default = argument.default
 
         if default is not None and (not isinstance(default, list) or len(default) > 0):
@@ -97,7 +97,7 @@ class AbstractHelp(Component):
             and default is not None
             and (not isinstance(default, list) or len(default) > 0)
         ):
-            description += " <b>{}</b>".format(self._format_value(default))
+            description += " <b>(default: {})</b>".format(self._format_value(default))
 
         if option.is_multi_valued():
             description = " <b>(multiple values allowed)</b>"
@@ -129,9 +129,9 @@ class AbstractHelp(Component):
             if option.is_value_required():
                 fmt = "{}\xC2\xA0<{}>"
             elif option.is_value_optional():
-                fmt = "\xC2\xA0[<{}>]"
+                fmt = "{}\xC2\xA0[<{}>]"
             else:
-                fmt = "{}{}"
+                fmt = "{}"
 
             if option.is_long_name_preferred():
                 option_name = "--{}".format(option.long_name)
@@ -142,11 +142,11 @@ class AbstractHelp(Component):
                 "[{}]".format(fmt.format(option_name, option.value_name))
             )
 
-        for argument in args_format.get_arguments(False).values():
+        for argument in args_format.get_arguments().values():
             arg_name = argument.name
 
             argument_parts.append(
-                ("{}" if argument.is_required() else "[{}]").format(
+                ("<{}>" if argument.is_required() else "[<{}>]").format(
                     arg_name + str(int(argument.is_multi_valued()) or "")
                 )
             )

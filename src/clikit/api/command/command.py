@@ -73,6 +73,9 @@ class Command(object):
     def get_sub_command(self, name):  # type: (str) -> Command
         return self._sub_commands.get(name)
 
+    def has_sub_commands(self):  # type: () -> bool
+        return len(self._sub_commands) > 0
+
     @property
     def named_sub_commands(self):  # type: () -> CommandCollection
         return self._named_sub_commands
@@ -80,12 +83,18 @@ class Command(object):
     def get_named_sub_command(self, name):  # type: (str) -> Command
         return self._named_sub_commands.get(name)
 
+    def has_named_sub_commands(self):  # type: () -> bool
+        return len(self._named_sub_commands) > 0
+
     @property
     def default_sub_commands(self):  # type: () -> CommandCollection
         return self._default_sub_commands
 
     def get_default_sub_command(self, name):  # type: (str) -> Command
         return self._default_sub_commands.get(name)
+
+    def has_default_sub_commands(self):  # type: () -> bool
+        return len(self._default_sub_commands) > 0
 
     def parse(self, args, lenient=None):  # type: (RawArgs, Optional[bool]) -> Args
         if lenient is None:

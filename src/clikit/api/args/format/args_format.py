@@ -79,7 +79,7 @@ class ArgsFormat(object):
         command_names = self._command_names
 
         if include_base and self._base_format:
-            command_names += self._base_format.get_command_names()
+            command_names = self._base_format.get_command_names() + command_names
 
         return command_names
 
@@ -191,7 +191,9 @@ class ArgsFormat(object):
         arguments = self._arguments.copy()
 
         if include_base and self._base_format:
-            arguments.update(self._base_format.get_arguments())
+            base_arguments = self._base_format.get_arguments()
+            base_arguments.update(arguments)
+            arguments = base_arguments
 
         return arguments
 

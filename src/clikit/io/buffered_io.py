@@ -23,8 +23,8 @@ class BufferedIO(IO):
             formatter = PlainFormatter()
 
         input = Input(StringInputStream(input_data))
-        output = Output(BufferedOutputStream())
-        error_output = Output(BufferedOutputStream())
+        output = Output(BufferedOutputStream(), formatter)
+        error_output = Output(BufferedOutputStream(), formatter)
 
         super(BufferedIO, self).__init__(input, output, error_output)
 
