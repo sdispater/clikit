@@ -29,3 +29,6 @@ class CommandName(object):
 
     def __str__(self):  # type: () -> str
         return self._string
+
+    def __repr__(self):  # type: () -> str
+        return 'CommandName("{}")'.format(self._string)
