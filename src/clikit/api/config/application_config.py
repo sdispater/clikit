@@ -33,6 +33,7 @@ class ApplicationConfig(Config):
         self._io_factory = None
         self._debug = False
         self._style_set = None
+        self._pre_resolve_hooks = []  # type: List[Callable]
 
         super(ApplicationConfig, self).__init__()
 
@@ -220,6 +221,16 @@ class ApplicationConfig(Config):
             return
 
         return re.sub(r"[\s\-_]+", " ", self._name).title()
+
+    @property
+    def pre_resolve_hooks(self):  # type: () -> List[Callable]
+        return self._pre_resolve_hooks
+
+    def has_pre_resolve_hooks(self):  # type: () -> bool
+        return len(self._pre_resolve_hooks) > 0
+
+    def add_pre_resolve_hook(self, hook):  # type: (Callable) -> ApplicationConfig
+        self._pre_resolve_hooks.append(hook)
 
     @property
     def default_style_set(self):  # type: () -> StyleSet

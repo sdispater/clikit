@@ -87,6 +87,13 @@ class ConsoleApplication(BaseApplication):
         return not self._default_commands.is_empty()
 
     def resolve_command(self, args):  # type: (RawArgs) -> ResolvedCommand
+        if self._config.has_pre_resolve_hooks():
+            for hook in self._config.pre_resolve_hooks:
+                resolved_command = hook(args, self)
+
+                if resolved_command:
+                    return resolved_command
+
         return self._config.command_resolver.resolve(args, self)
 
     def run(

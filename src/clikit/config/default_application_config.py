@@ -1,3 +1,5 @@
+from typing import Optional
+
 from clikit.api.config.application_config import ApplicationConfig
 from clikit.api.args.raw_args import RawArgs
 from clikit.api.args.format.argument import Argument
@@ -10,6 +12,7 @@ from clikit.api.io import OutputStream
 from clikit.api.io.flags import DEBUG
 from clikit.api.io.flags import VERBOSE
 from clikit.api.io.flags import VERY_VERBOSE
+from clikit.api.resolver import ResolvedCommand
 from clikit.formatter import AnsiFormatter
 from clikit.formatter import DefaultStyleSet
 from clikit.formatter import PlainFormatter
@@ -111,6 +114,9 @@ class DefaultApplicationConfig(ApplicationConfig):
         if args.has_token("--no-interaction") or args.has_token("-n"):
             io.set_interactive(False)
 
+        # Pre resolve hooks
+        self.add_pre_resolve_hook(self.resolve_help_command)
+
         return io
 
     @property
@@ -122,5 +128,16 @@ class DefaultApplicationConfig(ApplicationConfig):
         return DefaultStyleSet()
 
     @property
-    def default_command_resolver(self):  # type: () -> CommandResolver
+    def default_command_resolver(self):  # type: () -> DefaultResolver
         return DefaultResolver()
+
+    def resolve_help_command(
+        self, args, application
+    ):  # type: (RawArgs, Application) -> Optional[ResolvedCommand]
+        if args.has_token("-h") or args.has_token("--help"):
+            command = application.get_command("help")
+
+            # Enable lenient parsing
+            parsed_args = command.parse(args, True)
+
+            return ResolvedCommand(command, parsed_args)
