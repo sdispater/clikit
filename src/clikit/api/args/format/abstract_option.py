@@ -35,6 +35,10 @@ class AbstractOption(object):
         return self._short_name
 
     @property
+    def flags(self):  # type: () -> int
+        return self._flags
+
+    @property
     def description(self):  # type: () -> Optional[str]
         return self._description
 
