@@ -23,7 +23,7 @@ class CommandConfig(Config):
 
         self._name = name
         self._aliases = []
-        self._description = None
+        self._description = ""
         self._help = None
         self._enabled = True
         self._process_title = None
@@ -63,10 +63,10 @@ class CommandConfig(Config):
         return self.add_aliases(aliases)
 
     @property
-    def description(self):  # type: () -> Optional[str]
+    def description(self):  # type: () -> str
         return self._description
 
-    def set_description(self, description):  # type: (Optional[str]) -> CommandConfig
+    def set_description(self, description):  # type: (str) -> CommandConfig
         self._description = description
 
         return self
