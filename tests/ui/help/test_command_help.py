@@ -1,16 +1,8 @@
-import pytest
-
 from clikit import ConsoleApplication
 from clikit.api.args.format import Argument
 from clikit.api.args.format import Option
 from clikit.api.config import ApplicationConfig
-from clikit.io import BufferedIO
 from clikit.ui.help import CommandHelp
-
-
-@pytest.fixture()
-def io():
-    return BufferedIO()
 
 
 nbsp = "\xC2\xA0"
