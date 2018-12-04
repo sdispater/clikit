@@ -51,6 +51,16 @@ class TableStyle:
         return style
 
     @classmethod
+    def compact(cls):  # type: () -> TableStyle
+        style = TableStyle()
+        style.border_style = BorderStyle.none()
+        style.border_style.line_hc_char = ""
+        style.border_style.line_vc_char = " "
+        style.border_style.crossing_c_char = ""
+
+        return style
+
+    @classmethod
     def ascii(cls):  # type: () -> TableStyle
         style = TableStyle()
         style.header_cell_format = " {} "
