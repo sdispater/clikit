@@ -30,7 +30,7 @@ class Output(Formatter):
 
         self._formatter = formatter
         self._quiet = False
-        self._format_output = self._stream.supports_ansi()
+        self._format_output = self._stream.supports_ansi() or formatter.force_ansi()
         self._verbosity = 0
 
     def write(self, string, flags=None):  # type: (str, Optional[int]) -> None
@@ -99,7 +99,9 @@ class Output(Formatter):
         Sets the underlying stream.
         """
         self._stream = stream
-        self._format_output = self._stream.supports_ansi()
+        self._format_output = (
+            self._stream.supports_ansi() or self._formatter.force_ansi()
+        )
 
     @property
     def stream(self):  # type: () -> OutputStream
@@ -113,6 +115,7 @@ class Output(Formatter):
         Sets the underlying formatter.
         """
         self._formatter = formatter
+        self._format_output = self._stream.supports_ansi() or formatter.force_ansi()
 
     @property
     def formatter(self):  # type: () -> Formatter
@@ -155,7 +158,7 @@ class Output(Formatter):
         """
         Returns whether the verbosity is DEBUG.
         """
-        return self._verbosity == VERBOSE
+        return self._verbosity == DEBUG
 
     def set_quiet(self, quiet):  # type: (bool) -> None
         """
@@ -180,6 +183,9 @@ class Output(Formatter):
         Removes the format tags from the given string.
         """
         return self._formatter.remove_format(string)
+
+    def supports_ansi(self):  # type: () -> bool
+        return self._format_output
 
     def _may_write(self, flags):  # type: (int) -> bool
         """

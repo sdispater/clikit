@@ -5,4 +5,5 @@ from .exception_trace import ExceptionTrace
 from .labeled_paragraph import LabeledParagraph
 from .name_version import NameVersion
 from .paragraph import Paragraph
+from .progress_indicator import ProgressIndicator
 from .table import Table

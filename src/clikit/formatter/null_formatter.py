@@ -13,3 +13,6 @@ class NullFormatter(Formatter):
 
     def remove_format(self, string):  # type: (str) -> str
         return string
+
+    def force_ansi(self):  # type: () -> bool
+        return False

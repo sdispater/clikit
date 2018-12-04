@@ -45,3 +45,6 @@ class AnsiFormatter(Formatter):
     def remove_format(self, string):  # type: (str) -> str
         with self._formatter.colorized(False):
             return self._formatter.colorize(string)
+
+    def force_ansi(self):  # type: () -> bool
+        return True
