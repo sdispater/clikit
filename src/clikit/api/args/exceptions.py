@@ -10,7 +10,7 @@ class CannotAddOptionException(RuntimeError):
 
 class NoSuchOptionException(RuntimeError):
     def __init__(self, name):
-        message = 'The option "{}{}" does not exist.'.format(
+        message = 'The "{}{}" option does not exist.'.format(
             "--" if len(name) > 1 else "-", name
         )
 
@@ -36,7 +36,7 @@ class NoSuchArgumentException(RuntimeError):
         if isinstance(name, int):
             message = "The argument at position {} does not exist.".format(name)
         else:
-            message = 'The argument "{}" does not exist.'.format(name)
+            message = 'The "{}" argument does not exist.'.format(name)
 
         super(NoSuchArgumentException, self).__init__(message)
 
@@ -53,7 +53,7 @@ class CannotParseArgsException(RuntimeError):
         else:
             name = "--" + name
 
-        return cls('The option "{}" does not accept a value.'.format(name))
+        return cls('The "{}" option does not accept a value.'.format(name))
 
     @classmethod
     def option_requires_value(cls, name):
@@ -62,4 +62,4 @@ class CannotParseArgsException(RuntimeError):
         else:
             name = "--" + name
 
-        return cls('The option "{}" requires a value.'.format(name))
+        return cls('The "{}" option requires a value.'.format(name))

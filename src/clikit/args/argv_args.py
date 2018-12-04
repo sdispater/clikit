@@ -14,7 +14,7 @@ class ArgvArgs(RawArgs):
 
     def __init__(self, argv=None):  # type: (Optional[List[str]]) -> None
         if argv is None:
-            argv = sys.argv
+            argv = list(sys.argv)
 
         argv = argv[:]
         self._script_name = argv.pop(0)

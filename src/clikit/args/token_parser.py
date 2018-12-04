@@ -32,9 +32,11 @@ class TokenParser(object):
         tokens = []
 
         while self._is_valid():
-            while self._current.isspace():
+            if self._current.isspace():
                 # Skip spaces
                 self._next()
+
+                continue
 
             if self._is_valid():
                 tokens.append(self._parse_token())

@@ -56,7 +56,7 @@ class Argument(object):
 
         self._validate_flags(flags)
 
-        self._add_default_flags(flags)
+        flags = self._add_default_flags(flags)
 
         self._name = name
         self._flags = flags
@@ -159,9 +159,11 @@ class Argument(object):
                     "The argument flags INTEGER and FLOAT cannot be combined."
                 )
 
-    def _add_default_flags(self, flags):  # type: (int) -> None
+    def _add_default_flags(self, flags):  # type: (int) -> int
         if not flags & (self.REQUIRED | self.OPTIONAL):
             flags |= self.OPTIONAL
 
         if not flags & (self.STRING | self.BOOLEAN | self.INTEGER | self.FLOAT):
             flags |= self.STRING
+
+        return flags

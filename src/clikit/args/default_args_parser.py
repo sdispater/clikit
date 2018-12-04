@@ -1,11 +1,13 @@
+from typing import Dict
 from typing import List
 from typing import Optional
 
 
 from clikit.api.args.args import Args
 from clikit.api.args.args_parser import ArgsParser
-from clikit.api.args.format.args_format import ArgsFormat
-from clikit.api.args.format.args_format import Argument
+from clikit.api.args.format import ArgsFormat
+from clikit.api.args.format import Argument
+from clikit.api.args.format import CommandName
 from clikit.api.args.exceptions import CannotParseArgsException
 from clikit.api.args.exceptions import NoSuchOptionException
 from clikit.api.args.raw_args import RawArgs
@@ -25,20 +27,46 @@ class DefaultArgsParser(ArgsParser):
     ):  # type: (RawArgs, ArgsFormat, bool) -> Args
         self._arguments = {}
 
-        arguments = []
-        for i, command_name in enumerate(fmt.get_command_names()):
-            arg_name = "cmd{}".format(i + 1)
-            arguments.append(Argument(arg_name))
+        arguments = {}
+        command_names = {}
+        i = 1
+        for j, command_name in enumerate(fmt.get_command_names()):
+            arg_name = "cmd{}{}".format(j + 1, i)
+            while fmt.has_argument(arg_name):
+                i += 1
+                arg_name = "cmd{}{}".format(j + 1, i)
 
-        arguments += list(fmt.get_arguments().values())
+            arguments[arg_name] = Argument(arg_name, Argument.REQUIRED)
+            command_names[arg_name] = command_name
 
-        fmt = ArgsFormat(
-            fmt.get_command_names() + arguments + list(fmt.get_options().values())
+        arguments.update(fmt.get_arguments())
+
+        _fmt = ArgsFormat(
+            fmt.get_command_names()
+            + list(arguments.values())
+            + list(fmt.get_options().values())
         )
 
-        self._parse(args, fmt)
+        try:
+            self._parse(args, _fmt, lenient)
+        except (CannotParseArgsException, NoSuchOptionException):
+            if not lenient:
+                raise
 
-        self._insert_missing_command_names(fmt, lenient)
+        self._insert_missing_command_names(arguments, command_names, lenient)
+
+        # Validate
+        missing_arguments = [
+            arg.name
+            for arg in _fmt.get_arguments().values()
+            if arg.name not in self._arguments and arg.is_required()
+        ]
+        if missing_arguments and not lenient:
+            raise CannotParseArgsException(
+                'Not enough arguments (missing: "{}").'.format(
+                    ", ".join(missing_arguments)
+                )
+            )
 
         parsed_args = Args(fmt, args)
         for name, value in self._arguments.items():
@@ -51,7 +79,9 @@ class DefaultArgsParser(ArgsParser):
 
         return parsed_args
 
-    def _parse(self, raw_args, fmt):  # type: (RawArgs, ArgsFormat) -> None
+    def _parse(
+        self, raw_args, fmt, lenient
+    ):  # type: (RawArgs, ArgsFormat, bool) -> None
         tokens = raw_args.tokens[:]
 
         parse_options = True
@@ -62,29 +92,19 @@ class DefaultArgsParser(ArgsParser):
                 break
 
             if parse_options and token == "":
-                self._parse_argument(token, fmt)
+                self._parse_argument(token, fmt, lenient)
             elif parse_options and token == "--":
                 parse_options = False
             elif parse_options and token.find("--") == 0:
-                self._parse_long_option(token, tokens, fmt)
+                self._parse_long_option(token, tokens, fmt, lenient)
             elif parse_options and token[0] == "-" and token != "-":
-                self._parse_short_option(token, tokens, fmt)
+                self._parse_short_option(token, tokens, fmt, lenient)
             else:
-                self._parse_argument(token, fmt)
+                self._parse_argument(token, fmt, lenient)
 
     def _insert_missing_command_names(
-        self, fmt, lenient=False
-    ):  # type: (ArgsFormat, bool) -> None
-        arguments = {}
-        command_names = {}
-        for i, command_name in enumerate(fmt.get_command_names()):
-            arg_name = "cmd{}".format(i + 1)
-            arguments[arg_name] = Argument(arg_name)
-            command_names[arg_name] = command_name
-
-        for a in fmt.get_arguments().values():
-            arguments[a.name] = a
-
+        self, arguments, command_names, lenient=False
+    ):  # type: (Dict[str, Argument], Dict[str, CommandName], bool) -> None
         fixed_values = {}
 
         actual_values = self._flatten(self._arguments.values())
@@ -94,7 +114,7 @@ class DefaultArgsParser(ArgsParser):
         arguments_iterator = iter(arguments.values())
 
         actual_value, command_name = self._skip_command_names(
-            actual_values_iterator, command_names_iterator
+            actual_values_iterator, command_names_iterator, arguments_iterator
         )
 
         _, argument = self._copy_argument_values(
@@ -117,13 +137,14 @@ class DefaultArgsParser(ArgsParser):
         for name, value in fixed_values.items():
             self._arguments[name] = value
 
-    def _skip_command_names(self, actual_values, command_names):
+    def _skip_command_names(self, actual_values, command_names, arguments):
         arg = next(actual_values, None)
         command_name = next(command_names, None)
 
         while arg and command_name and command_name.match(arg):
             arg = next(actual_values, None)
             command_name = next(command_names, None)
+            next(arguments, None)
 
         return arg, command_name
 
@@ -175,13 +196,21 @@ class DefaultArgsParser(ArgsParser):
 
         return result
 
-    def _parse_argument(self, token, fmt):  # type: (str, ArgsFormat) -> None
+    def _parse_argument(
+        self, token, fmt, lenient
+    ):  # type: (str, ArgsFormat, bool) -> None
         c = len(self._arguments)
 
         # if input is expecting another argument, add it
         if fmt.has_argument(c):
             arg = fmt.get_argument(c)
-            self._arguments[arg.name] = token
+            if arg.is_multi_valued():
+                if arg.name not in self._arguments:
+                    self._arguments[arg.name] = []
+
+                self._arguments[arg.name].append(token)
+            else:
+                self._arguments[arg.name] = token
         elif fmt.has_argument(c - 1) and fmt.get_argument(c - 1).is_multi_valued():
             arg = fmt.get_argument(c - 1)
             if arg.name not in self._arguments:
@@ -190,15 +219,16 @@ class DefaultArgsParser(ArgsParser):
             self._arguments[arg.name].append(token)
         # unexpected argument
         else:
-            raise CannotParseArgsException.too_many_arguments()
+            if not lenient:
+                raise CannotParseArgsException.too_many_arguments()
 
     def _parse_long_option(
-        self, token, tokens, fmt
-    ):  # type: (str, List[str], ArgsFormat) -> None
+        self, token, tokens, fmt, lenient
+    ):  # type: (str, List[str], ArgsFormat, bool) -> None
         name = token[2:]
         pos = name.find("=")
         if pos != -1:
-            self._add_long_option(name[:pos], name[pos + 1 :], tokens, fmt)
+            self._add_long_option(name[:pos], name[pos + 1 :], tokens, fmt, lenient)
         else:
             if fmt.has_option(name) and fmt.get_option(name).accepts_value():
                 try:
@@ -210,20 +240,20 @@ class DefaultArgsParser(ArgsParser):
                     tokens.insert(0, value)
                     value = None
 
-                self._add_long_option(name, value, tokens, fmt)
+                self._add_long_option(name, value, tokens, fmt, lenient)
             else:
-                self._add_long_option(name, None, tokens, fmt)
+                self._add_long_option(name, None, tokens, fmt, lenient)
 
     def _parse_short_option(
-        self, token, tokens, fmt
-    ):  # type: (str, List[str], ArgsFormat) -> None
+        self, token, tokens, fmt, lenient
+    ):  # type: (str, List[str], ArgsFormat, bool) -> None
         name = token[1:]
         if len(name) > 1:
             if fmt.has_option(name[0]) and fmt.get_option(name[0]).accepts_value():
                 # an option with a value (with no space)
-                self._add_short_option(name[0], name[1], tokens, fmt)
+                self._add_short_option(name[0], name[1:], tokens, fmt, lenient)
             else:
-                self._parse_short_option_set(name, tokens, fmt)
+                self._parse_short_option_set(name, tokens, fmt, lenient)
         else:
             if fmt.has_option(name[0]) and fmt.get_option(name[0]).accepts_value():
                 try:
@@ -235,13 +265,13 @@ class DefaultArgsParser(ArgsParser):
                     tokens.insert(0, value)
                     value = None
 
-                self._add_short_option(name, value, tokens, fmt)
+                self._add_short_option(name, value, tokens, fmt, lenient)
             else:
-                self._add_short_option(name, None, tokens, fmt)
+                self._add_short_option(name, None, tokens, fmt, lenient)
 
     def _parse_short_option_set(
-        self, name, tokens, fmt
-    ):  # type: (str, List[str], ArgsFormat) -> None
+        self, name, tokens, fmt, lenient
+    ):  # type: (str, List[str], ArgsFormat, bool) -> None
         l = len(name)
         for i in range(0, l):
             if not fmt.has_option(name[i]):
@@ -250,16 +280,20 @@ class DefaultArgsParser(ArgsParser):
             option = fmt.get_option(name[i])
             if option.accepts_value():
                 self._add_long_option(
-                    option.long_name, None if l - 1 == i else name[i + 1 :], tokens, fmt
+                    option.long_name,
+                    None if l - 1 == i else name[i + 1 :],
+                    tokens,
+                    fmt,
+                    lenient,
                 )
 
                 break
             else:
-                self._add_long_option(option.long_name, None, tokens, fmt)
+                self._add_long_option(option.long_name, None, tokens, fmt, lenient)
 
     def _add_long_option(
-        self, name, value, tokens, fmt
-    ):  # type: (str, Optional[str], List[str], ArgsFormat) -> None
+        self, name, value, tokens, fmt, lenient
+    ):  # type: (str, Optional[str], List[str], ArgsFormat, bool) -> None
         if not fmt.has_option(name):
             raise NoSuchOptionException(name)
 
@@ -307,9 +341,11 @@ class DefaultArgsParser(ArgsParser):
             self._options[name] = value
 
     def _add_short_option(
-        self, name, value, tokens, fmt
-    ):  # type: (str, Optional[str], List[str], ArgsFormat) -> None
+        self, name, value, tokens, fmt, lenient
+    ):  # type: (str, Optional[str], List[str], ArgsFormat, bool) -> None
         if not fmt.has_option(name):
             raise NoSuchOptionException(name)
 
-        self._add_long_option(fmt.get_option(name).long_name, value, tokens, fmt)
+        self._add_long_option(
+            fmt.get_option(name).long_name, value, tokens, fmt, lenient
+        )

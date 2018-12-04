@@ -98,6 +98,8 @@ class Option(AbstractOption):
         self._default = default
 
     def _validate_flags(self, flags):  # type: (int) -> None
+        super(Option, self)._validate_flags(flags)
+
         if flags & self.NO_VALUE:
             if flags & self.REQUIRED_VALUE:
                 raise ValueError(

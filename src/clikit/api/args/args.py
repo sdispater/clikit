@@ -124,7 +124,7 @@ class Args(object):
                 value = [value]
 
             for i, v in enumerate(value):
-                value[i] = argument.parse(value)
+                value[i] = argument.parse(v)
         else:
             value = argument.parse(value)
 

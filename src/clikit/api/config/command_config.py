@@ -147,8 +147,8 @@ class CommandConfig(Config):
         if not self._anonymous:
             builder.add_command_name(CommandName(self.name, self.aliases))
 
-        builder.add_options(self.options.values())
-        builder.add_arguments(self.arguments.values())
+        builder.add_options(*self.options.values())
+        builder.add_arguments(*self.arguments.values())
 
         return builder.format
 

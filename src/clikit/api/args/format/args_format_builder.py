@@ -2,8 +2,8 @@ from typing import Dict
 from typing import Iterable
 from typing import List
 from typing import Optional
+from typing import Tuple
 from typing import Union
-
 
 from ..exceptions import CannotAddArgumentException
 from ..exceptions import CannotAddOptionException
@@ -37,17 +37,17 @@ class ArgsFormatBuilder(object):
         return self._base_format
 
     def set_command_names(
-        self, command_names
-    ):  # type: (List[CommandName]) -> ArgsFormatBuilder
-        self._command_names = {}
+        self, *command_names
+    ):  # type: (Tuple[CommandName]) -> ArgsFormatBuilder
+        self._command_names = []
 
-        self.add_command_names(command_names)
+        self.add_command_names(*command_names)
 
         return self
 
     def add_command_names(
-        self, command_names
-    ):  # type: (List[CommandName]) -> ArgsFormatBuilder
+        self, *command_names
+    ):  # type: (Tuple[CommandName]) -> ArgsFormatBuilder
         for command_name in command_names:
             self.add_command_name(command_name)
 
@@ -73,21 +73,21 @@ class ArgsFormatBuilder(object):
         command_names = self._command_names
 
         if include_base and self._base_format:
-            command_names += self._base_format.get_command_names()
+            command_names = self._base_format.get_command_names() + command_names
 
         return command_names
 
     def set_command_options(
-        self, command_options
-    ):  # type: (List[CommandOption]) -> ArgsFormatBuilder
+        self, *command_options
+    ):  # type: (Tuple[CommandOption]) -> ArgsFormatBuilder
         self._command_options = {}
         self._command_options_by_short_name = {}
 
-        self.add_command_options(command_options)
+        self.add_command_options(*command_options)
 
     def add_command_options(
-        self, command_options
-    ):  # type: (List[CommandOption]) -> ArgsFormatBuilder
+        self, *command_options
+    ):  # type: (Tuple[CommandOption]) -> ArgsFormatBuilder
         for command_option in command_options:
             self.add_command_option(command_option)
 
@@ -169,18 +169,18 @@ class ArgsFormatBuilder(object):
         return command_options
 
     def set_arguments(
-        self, arguments
+        self, *arguments
     ):  # type: (Iterable[Argument]) -> ArgsFormatBuilder
         self._arguments = {}
         self._has_multi_valued_arg = False
         self._hash_optional_arg = False
 
-        self.add_arguments(arguments)
+        self.add_arguments(*arguments)
 
         return self
 
     def add_arguments(
-        self, arguments
+        self, *arguments
     ):  # type: (Iterable[Argument]) -> ArgsFormatBuilder
         for argument in arguments:
             self.add_argument(argument)
@@ -215,7 +215,7 @@ class ArgsFormatBuilder(object):
         arguments = self.get_arguments(include_base)
 
         if isinstance(name, int):
-            arguments = arguments.values()
+            return name < len(arguments)
 
         return name in arguments
 
@@ -257,7 +257,7 @@ class ArgsFormatBuilder(object):
 
     def get_argument(
         self, name, include_base=True
-    ):  # type: (Union[str, int], bool) -> bool
+    ):  # type: (Union[str, int], bool) -> Argument
         if isinstance(name, int):
             arguments = list(self.get_arguments(include_base).values())
 
@@ -279,13 +279,13 @@ class ArgsFormatBuilder(object):
 
         return arguments
 
-    def set_options(self, options):  # type: (Iterable[Option]) -> ArgsFormatBuilder
+    def set_options(self, *options):  # type: (Iterable[Option]) -> ArgsFormatBuilder
         self._options = {}
         self._options_by_short_name = {}
 
-        self.add_options(options)
+        self.add_options(*options)
 
-    def add_options(self, options):  # type: (Iterable[Option]) -> ArgsFormatBuilder
+    def add_options(self, *options):  # type: (Iterable[Option]) -> ArgsFormatBuilder
         for option in options:
             self.add_option(option)
 

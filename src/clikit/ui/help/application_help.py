@@ -33,7 +33,7 @@ class ApplicationHelp(AbstractHelp):
         builder.add_argument(
             Argument("arg", Argument.MULTI_VALUED, "The arguments of the command")
         )
-        builder.add_options(global_args_format.get_options().values())
+        builder.add_options(*global_args_format.get_options().values())
 
         args_format = builder.format
 
