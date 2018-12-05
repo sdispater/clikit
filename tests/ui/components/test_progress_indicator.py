@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
+import os
 import time
 
 from clikit.formatter import AnsiFormatter
 from clikit.ui.components import ProgressIndicator
 
 
-def test_default_indicator(io):
-    bar = ProgressIndicator(io)
+def test_default_indicator(ansi_io):
+    bar = ProgressIndicator(ansi_io)
     bar.start("Starting...")
     time.sleep(0.101)
     bar.advance()
@@ -30,25 +32,41 @@ def test_default_indicator(io):
     bar.advance()
     bar.finish("Done Again...", reset_indicator=True)
 
-    expected = "\n".join([" Starting...", " Advancing...", " Done..."])
+    output = [
+        " - Starting...",
+        " \\ Starting...",
+        " | Starting...",
+        " / Starting...",
+        " - Starting...",
+        " \\ Starting...",
+        " \\ Advancing...",
+        " | Advancing...",
+        " | Done...",
+    ]
 
-    expected += "\n\n"
+    expected = "\x0D\x1B[2K" + "\x0D\x1B[2K".join(output)
 
-    expected += "\n".join([" Starting Again...", " Done Again..."])
+    expected += os.linesep
 
-    expected += "\n\n"
+    output = [" - Starting Again...", " \\ Starting Again...", " \\ Done Again..."]
 
-    expected += "\n".join([" Starting Again...", " Done Again..."])
+    expected += "\x0D\x1B[2K" + "\x0D\x1B[2K".join(output)
 
-    expected += "\n\n"
+    expected += os.linesep
 
-    assert expected == io.fetch_output()
+    output = [" - Starting Again...", " \\ Starting Again...", " - Done Again..."]
+
+    expected += "\x0D\x1B[2K" + "\x0D\x1B[2K".join(output)
+
+    expected += os.linesep
+
+    assert expected == ansi_io.fetch_error()
 
 
-def test_explicit_format(io):
-    io.set_formatter(AnsiFormatter())
+def test_explicit_format(ansi_io):
+    ansi_io.set_formatter(AnsiFormatter())
 
-    bar = ProgressIndicator(io, ProgressIndicator.NORMAL)
+    bar = ProgressIndicator(ansi_io, ProgressIndicator.NORMAL)
     bar.start("Starting...")
     time.sleep(0.101)
     bar.advance()
@@ -73,32 +91,32 @@ def test_explicit_format(io):
     bar.advance()
     bar.finish("Done Again...", reset_indicator=True)
 
-    expected = "\n".join(
-        [
-            " - Starting...",
-            " \\ Starting...",
-            " | Starting...",
-            " / Starting...",
-            " - Starting...",
-            " \\ Starting...",
-            " \\ Advancing...",
-            " | Advancing...",
-            " | Done...",
-        ]
-    )
+    output = [
+        " - Starting...",
+        " \\ Starting...",
+        " | Starting...",
+        " / Starting...",
+        " - Starting...",
+        " \\ Starting...",
+        " \\ Advancing...",
+        " | Advancing...",
+        " | Done...",
+    ]
 
-    expected += "\n\n"
+    expected = "\x0D\x1B[2K" + "\x0D\x1B[2K".join(output)
 
-    expected += "\n".join(
-        [" - Starting Again...", " \\ Starting Again...", " \\ Done Again..."]
-    )
+    expected += os.linesep
 
-    expected += "\n\n"
+    output = [" - Starting Again...", " \\ Starting Again...", " \\ Done Again..."]
 
-    expected += "\n".join(
-        [" - Starting Again...", " \\ Starting Again...", " - Done Again..."]
-    )
+    expected += "\x0D\x1B[2K" + "\x0D\x1B[2K".join(output)
 
-    expected += "\n\n"
+    expected += os.linesep
 
-    assert expected == io.fetch_output()
+    output = [" - Starting Again...", " \\ Starting Again...", " - Done Again..."]
+
+    expected += "\x0D\x1B[2K" + "\x0D\x1B[2K".join(output)
+
+    expected += os.linesep
+
+    assert expected == ansi_io.fetch_error()

@@ -22,6 +22,7 @@ class StreamOutputStream(OutputStream):
             raise io.UnsupportedOperation("Cannot write to a closed input.")
 
         self._stream.write(string)
+        self._stream.flush()
 
     def flush(self):  # type: () -> None
         """

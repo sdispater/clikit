@@ -7,6 +7,7 @@ from typing import List
 from typing import Optional
 
 from clikit.api.io import IO
+from clikit.formatter import AnsiFormatter
 from clikit.utils.time import format_time
 
 
@@ -83,7 +84,7 @@ class ProgressIndicator(object):
         if not self._started:
             raise RuntimeError("Progress indicator has not yet been started.")
 
-        if not self._io.output.supports_ansi():
+        if not isinstance(self._io.error_output.formatter, AnsiFormatter):
             return
 
         current_time = self._get_current_time_in_milliseconds()
@@ -109,7 +110,7 @@ class ProgressIndicator(object):
             self._current = 0
 
         self._display()
-        self._io.write_line("")
+        self._io.error_line("")
         self._started = False
 
     @contextmanager
@@ -126,7 +127,7 @@ class ProgressIndicator(object):
         try:
             yield self
         except (Exception, KeyboardInterrupt):
-            self._io.write_line("")
+            self._io.error_line("")
 
             self._auto_running.set()
             self._auto_thread.join()
@@ -163,14 +164,14 @@ class ProgressIndicator(object):
         """
         Overwrites a previous message to the output.
         """
-        if self._io.output.stream.supports_ansi():
-            self._io.write("\x0D\x1B[2K")
-            self._io.write(message)
+        if isinstance(self._io.error_output.formatter, AnsiFormatter):
+            self._io.error("\x0D\x1B[2K")
+            self._io.error(message)
         else:
-            self._io.write_line(message)
+            self._io.error_line(message)
 
     def _determine_best_format(self):
-        decorated = self._io.output.supports_ansi()
+        decorated = self._io.error_output.supports_ansi()
 
         if self._io.is_very_verbose():
             if decorated:
