@@ -103,7 +103,7 @@ class AbstractHelp(Component):
             description += " <b>(default: {})</b>".format(self._format_value(default))
 
         if option.is_multi_valued():
-            description = " <b>(multiple values allowed)</b>"
+            description += " <b>(multiple values allowed)</b>"
 
         layout.add(LabeledParagraph(name, description))
 
