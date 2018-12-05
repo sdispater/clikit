@@ -1,9 +1,11 @@
-from typing import Optional
-
 from clikit.api.config.application_config import ApplicationConfig
 from clikit.api.args.raw_args import RawArgs
 from clikit.api.args.format.argument import Argument
 from clikit.api.args.format.option import Option
+from clikit.api.event import ConsoleEvents
+from clikit.api.event import EventDispatcher
+from clikit.api.event import PreHandleEvent
+from clikit.api.event import PreResolveEvent
 from clikit.api.io import IO
 from clikit.api.io import Input
 from clikit.api.io import InputStream
@@ -22,6 +24,7 @@ from clikit.io.input_stream import StandardInputStream
 from clikit.io.output_stream import ErrorOutputStream
 from clikit.io.output_stream import StandardOutputStream
 from clikit.resolver.default_resolver import DefaultResolver
+from clikit.ui.components import NameVersion
 
 
 class DefaultApplicationConfig(ApplicationConfig):
@@ -31,6 +34,10 @@ class DefaultApplicationConfig(ApplicationConfig):
 
     def configure(self):
         self.set_io_factory(self.create_io)
+        self.add_event_listener(
+            ConsoleEvents.PRE_RESOLVE.value, self.resolve_help_command
+        )
+        self.add_event_listener(ConsoleEvents.PRE_HANDLE.value, self.print_version)
 
         self.add_option("help", "h", Option.NO_VALUE, "Display this help message")
         self.add_option("quiet", "q", Option.NO_VALUE, "Do not output any message")
@@ -114,9 +121,6 @@ class DefaultApplicationConfig(ApplicationConfig):
         if args.has_token("--no-interaction") or args.has_token("-n"):
             io.set_interactive(False)
 
-        # Pre resolve hooks
-        self.add_pre_resolve_hook(self.resolve_help_command)
-
         return io
 
     @property
@@ -132,12 +136,25 @@ class DefaultApplicationConfig(ApplicationConfig):
         return DefaultResolver()
 
     def resolve_help_command(
-        self, args, application
-    ):  # type: (RawArgs, Application) -> Optional[ResolvedCommand]
+        self, event, event_name, dispatcher
+    ):  # type: (PreResolveEvent, str, EventDispatcher) -> None
+        args = event.raw_args
+        application = event.application
+
         if args.has_token("-h") or args.has_token("--help"):
             command = application.get_command("help")
 
             # Enable lenient parsing
             parsed_args = command.parse(args, True)
 
-            return ResolvedCommand(command, parsed_args)
+            event.set_resolved_command(ResolvedCommand(command, parsed_args))
+            event.stop_propagation()
+
+    def print_version(
+        self, event, event_name, dispatcher
+    ):  # type: (PreHandleEvent, str, EventDispatcher) -> None
+        if event.args.is_option_set("version"):
+            version = NameVersion(event.command.application.config)
+            version.render(event.io)
+
+            event.handled(True)

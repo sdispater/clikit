@@ -5,6 +5,8 @@ from clikit.api.args.args import Args
 from clikit.api.args.raw_args import RawArgs
 from clikit.api.args.format.args_format import ArgsFormat
 from clikit.api.config.command_config import CommandConfig
+from clikit.api.event import ConsoleEvents
+from clikit.api.event import PreHandleEvent
 from clikit.api.io import IO
 
 
@@ -31,6 +33,7 @@ class Command(object):
         self._named_sub_commands = CommandCollection()
         self._default_sub_commands = CommandCollection()
         self._args_format = config.build_args_format(self.base_format)
+        self._dispatcher = application.config.dispatcher if application else None
 
         for sub_config in config.sub_command_configs:
             self.add_sub_command(sub_config)
@@ -142,6 +145,15 @@ class Command(object):
             self._named_sub_commands.add(command)
 
     def _do_handle(self, args, io):  # type: (Args, IO) -> Optional[int]
+        if self._dispatcher and self._dispatcher.has_listeners(
+            ConsoleEvents.PRE_HANDLE.value
+        ):
+            event = PreHandleEvent(args, io, self)
+            self._dispatcher.dispatch(ConsoleEvents.PRE_HANDLE.value, event)
+
+            if event.is_handled():
+                return event.status_code
+
         handler = self._config.handler
         handler_method = self._config.handler_method
 

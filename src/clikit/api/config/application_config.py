@@ -6,6 +6,7 @@ from typing import Callable
 from typing import List
 from typing import Optional
 
+from clikit.api.event import EventDispatcher
 from clikit.api.formatter import Style
 from clikit.api.formatter import StyleSet
 from clikit.api.command.exceptions import NoSuchCommandException
@@ -33,6 +34,7 @@ class ApplicationConfig(Config):
         self._io_factory = None
         self._debug = False
         self._style_set = None
+        self._dispatcher = None
         self._pre_resolve_hooks = []  # type: List[Callable]
 
         super(ApplicationConfig, self).__init__()
@@ -78,6 +80,27 @@ class ApplicationConfig(Config):
 
     def set_help(self, help):  # type: (Optional[str]) -> ApplicationConfig
         self._help = help
+
+        return self
+
+    @property
+    def dispatcher(self):  # type: () -> EventDispatcher
+        return self._dispatcher
+
+    def set_event_dispatcher(
+        self, dispatcher
+    ):  # type: (EventDispatcher) -> ApplicationConfig
+        self._dispatcher = dispatcher
+
+        return self
+
+    def add_event_listener(
+        self, event_name, listener, priority=0
+    ):  # type: (str, Callable, int) -> ApplicationConfig
+        if self._dispatcher is None:
+            self._dispatcher = EventDispatcher()
+
+        self._dispatcher.add_listener(event_name, listener, priority)
 
         return self
 
@@ -221,16 +244,6 @@ class ApplicationConfig(Config):
             return
 
         return re.sub(r"[\s\-_]+", " ", self._name).title()
-
-    @property
-    def pre_resolve_hooks(self):  # type: () -> List[Callable]
-        return self._pre_resolve_hooks
-
-    def has_pre_resolve_hooks(self):  # type: () -> bool
-        return len(self._pre_resolve_hooks) > 0
-
-    def add_pre_resolve_hook(self, hook):  # type: (Callable) -> ApplicationConfig
-        self._pre_resolve_hooks.append(hook)
 
     @property
     def default_style_set(self):  # type: () -> StyleSet
