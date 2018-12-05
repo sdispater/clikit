@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import json
 
 from typing import Any
@@ -127,9 +130,9 @@ class AbstractHelp(Component):
         for option in args_format.get_options(False).values():
             # \xC2\xA0 is a non-breaking space
             if option.is_value_required():
-                fmt = "{}\xC2\xA0<{}>"
+                fmt = "{}\u00A0<{}>"
             elif option.is_value_optional():
-                fmt = "{}\xC2\xA0[<{}>]"
+                fmt = "{}\u00A0[<{}>]"
             else:
                 fmt = "{}"
 

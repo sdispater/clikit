@@ -4,6 +4,7 @@ from typing import Optional
 
 from clikit.api.formatter import Formatter
 from clikit.formatter import NullFormatter
+from clikit.utils._compat import to_str
 
 from .flags import DEBUG
 from .flags import NORMAL
@@ -45,7 +46,7 @@ class Output(Formatter):
             else:
                 formatted = self.remove_format(string)
 
-            self._stream.write(formatted)
+            self._stream.write(to_str(formatted))
 
     def write_line(self, string, flags=None):  # type: (str, Optional[int]) -> None
         """
@@ -60,21 +61,21 @@ class Output(Formatter):
             else:
                 formatted = self.remove_format(string)
 
-            self._stream.write(formatted + os.linesep)
+            self._stream.write(to_str(formatted + os.linesep))
 
     def write_raw(self, string, flags=None):  # type: (str, Optional[int]) -> None
         """
         Writes a string to the output stream without formatting.
         """
         if self._may_write(flags):
-            self._stream.write(string)
+            self._stream.write(to_str(string))
 
     def write_line_raw(self, string, flags=None):  # type: (str, Optional[int]) -> None
         """
         Writes a string to the output stream without formatting.
         """
         if self._may_write(flags):
-            self._stream.write(string.rstrip(os.linesep) + os.linesep)
+            self._stream.write(to_str(string.rstrip(os.linesep) + os.linesep))
 
     def flush(self):  # type: () -> None
         """

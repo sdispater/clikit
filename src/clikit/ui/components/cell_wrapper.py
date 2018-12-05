@@ -1,3 +1,5 @@
+from __future__ import division
+
 import textwrap
 
 from typing import List
@@ -128,7 +130,7 @@ class CellWrapper:
 
     def _wrap_columns(self, formatter):  # type: (Formatter) -> None
         available_width = self._max_total_width
-        long_column_lengths = self._column_lengths.copy()
+        long_column_lengths = self._column_lengths[:]
 
         # Filter "short" column, i.e. columns that are not wrapped
         # We distribute the available screen width by the number of columns
@@ -166,7 +168,9 @@ class CellWrapper:
 
             # Keep ratios of column lengths and distribute them among the
             # available width
-            self._column_lengths[col] = round((length / actual_width) * available_width)
+            self._column_lengths[col] = int(
+                round((length / actual_width) * available_width)
+            )
 
             if col == last_adapted_col:
                 # Fix rounding errors

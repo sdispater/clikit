@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from clikit import ConsoleApplication
 from clikit.api.args.format import Argument
 from clikit.api.args.format import Option
@@ -5,7 +7,7 @@ from clikit.api.config import ApplicationConfig
 from clikit.ui.help import CommandHelp
 
 
-nbsp = "\xC2\xA0"
+nbsp = "\u00A0"
 
 
 def test_render(io):

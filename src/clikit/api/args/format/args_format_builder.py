@@ -5,6 +5,8 @@ from typing import Optional
 from typing import Tuple
 from typing import Union
 
+from clikit.utils._compat import OrderedDict
+
 from ..exceptions import CannotAddArgumentException
 from ..exceptions import CannotAddOptionException
 from ..exceptions import NoSuchArgumentException
@@ -24,11 +26,11 @@ class ArgsFormatBuilder(object):
     def __init__(self, base_format=None):  # type: (Optional[ArgsFormat]) -> None
         self._base_format = base_format
         self._command_names = []
-        self._command_options = {}
-        self._command_options_by_short_name = {}
-        self._arguments = {}
-        self._options = {}
-        self._options_by_short_name = {}
+        self._command_options = OrderedDict()
+        self._command_options_by_short_name = OrderedDict()
+        self._arguments = OrderedDict()
+        self._options = OrderedDict()
+        self._options_by_short_name = OrderedDict()
         self._has_multi_valued_arg = False
         self._hash_optional_arg = False
 

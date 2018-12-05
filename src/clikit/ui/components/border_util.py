@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import math
 
 from typing import List
@@ -111,7 +113,7 @@ class BorderUtil:
                     elif alignment == Alignment.RIGHT:
                         padding_left = padding_char * total_pad_length
                     else:
-                        left_pad_length = math.floor(total_pad_length / 2)
+                        left_pad_length = int(math.floor(total_pad_length / 2))
                         padding_left = padding_char * left_pad_length
                         padding_right = padding_char * (
                             total_pad_length - left_pad_length

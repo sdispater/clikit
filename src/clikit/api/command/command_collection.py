@@ -1,5 +1,7 @@
 from typing import List
 
+from clikit.utils._compat import OrderedDict
+
 from .command import Command
 from .exceptions import NoSuchCommandException
 
@@ -13,9 +15,9 @@ class CommandCollection(object):
         if commands is None:
             commands = []
 
-        self._commands = {}
-        self._short_name_index = {}
-        self._alias_index = {}
+        self._commands = OrderedDict()
+        self._short_name_index = OrderedDict()
+        self._alias_index = OrderedDict()
 
         for command in commands:
             self.add(command)

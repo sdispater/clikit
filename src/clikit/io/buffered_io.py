@@ -6,6 +6,7 @@ from clikit.api.io import IO
 from clikit.api.io import Input
 from clikit.api.io import Output
 from clikit.formatter import PlainFormatter
+from clikit.utils._compat import to_str
 
 from .input_stream import StringInputStream
 from .output_stream import BufferedOutputStream

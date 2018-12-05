@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from .alignment import Alignment
 from .border_style import BorderStyle
 

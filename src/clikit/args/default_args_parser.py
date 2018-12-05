@@ -12,6 +12,8 @@ from clikit.api.args.exceptions import CannotParseArgsException
 from clikit.api.args.exceptions import NoSuchOptionException
 from clikit.api.args.raw_args import RawArgs
 
+from clikit.utils._compat import OrderedDict
+
 
 class DefaultArgsParser(ArgsParser):
     """
@@ -19,16 +21,16 @@ class DefaultArgsParser(ArgsParser):
     """
 
     def __init__(self):  # type: () -> None
-        self._arguments = {}
-        self._options = {}
+        self._arguments = OrderedDict()
+        self._options = OrderedDict()
 
     def parse(
         self, args, fmt, lenient=False
     ):  # type: (RawArgs, ArgsFormat, bool) -> Args
-        self._arguments = {}
+        self._arguments = OrderedDict()
 
-        arguments = {}
-        command_names = {}
+        arguments = OrderedDict()
+        command_names = OrderedDict()
         i = 1
         for j, command_name in enumerate(fmt.get_command_names()):
             arg_name = "cmd{}{}".format(j + 1, i)
