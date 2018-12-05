@@ -16,3 +16,6 @@ class NullFormatter(Formatter):
 
     def force_ansi(self):  # type: () -> bool
         return False
+
+    def add_style(self, style):  # type: (Style) -> None
+        pass

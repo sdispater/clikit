@@ -48,3 +48,13 @@ class AnsiFormatter(Formatter):
 
     def force_ansi(self):  # type: () -> bool
         return True
+
+    def add_style(self, style):  # type: (Style) -> None
+        pastel_style = StyleConverter.convert(style)
+
+        self._formatter.add_style(
+            style.tag,
+            pastel_style.foreground,
+            pastel_style.background,
+            pastel_style.options,
+        )

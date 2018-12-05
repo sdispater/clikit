@@ -17,3 +17,6 @@ class Formatter(object):
 
     def force_ansi(self):  # type: () -> bool
         raise NotImplementedError()
+
+    def add_style(self, style):  # type: (Style) -> None
+        raise NotImplementedError()
