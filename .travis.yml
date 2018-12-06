@@ -1,0 +1,37 @@
+language: python
+
+stages:
+  - linting
+  - test
+
+cache:
+  pip: true
+  directories:
+    - $HOME/.cache/pypoetry
+    - $HOME/.cache/pre-commit
+
+install:
+  - curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+  - source $HOME/.poetry/env
+  - poetry install -v
+
+script:
+  - pytest --cov clikit tests/
+
+jobs:
+  include:
+    - python: "2.7"
+    - python: "3.4"
+    - python: "3.5"
+    - python: "3.6"
+    - python: "3.7"
+      dist: xenial
+    - python: "pypy3"
+
+    - stage: linting
+      python: "3.6"
+      install:
+        - pip install pre-commit
+        - pre-commit install-hooks
+      script:
+        - pre-commit run --all-files
