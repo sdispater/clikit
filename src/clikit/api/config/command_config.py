@@ -26,6 +26,7 @@ class CommandConfig(Config):
         self._description = ""
         self._help = None
         self._enabled = True
+        self._hidden = False
         self._process_title = None
         self._default = None
         self._anonymous = None
@@ -90,6 +91,14 @@ class CommandConfig(Config):
 
     def disable(self):  # type: () -> CommandConfig
         self._enabled = False
+
+        return self
+
+    def is_hidden(self):  # type: () -> bool
+        return self._hidden
+
+    def hide(self, hidden=True):  # type: (bool) -> CommandConfig
+        self._hidden = hidden
 
         return self
 
