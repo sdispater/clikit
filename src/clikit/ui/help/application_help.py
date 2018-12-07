@@ -86,6 +86,8 @@ class ApplicationHelp(AbstractHelp):
         layout.add(LabeledParagraph(name, description))
 
     def _render_description(self, layout, help):  # type: (BlockLayout, str) -> None
+        help = help.format(script_name=self._application.config.name or "console")
+
         layout.add(Paragraph("<b>DESCRIPTION</b>"))
         with layout.block():
             layout.add(Paragraph(help))

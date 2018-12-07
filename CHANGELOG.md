@@ -2,7 +2,9 @@
 
 ## [Unreleased]
 
-Nothing yet.
+### Changed
+
+- The `help` command will now insert the script name and command name where needed.
 
 
 ## [0.2.0] - 2018-12-06

@@ -18,7 +18,7 @@ def test_render(io):
 
     with config.command("command") as c:
         c.set_description('Description of "command"')
-        c.set_help('Help of "command"')
+        c.set_help('Help of "command {command_name} of {script_name}"')
         c.add_alias("command-alias")
         c.add_argument("argument", 0, 'Description of "argument"')
         c.add_option("option", None, 0, 'Description of "option"')
@@ -44,7 +44,7 @@ GLOBAL OPTIONS
   --global-option    Description of "global-option"
 
 DESCRIPTION
-  Help of "command"
+  Help of "command command of test-bin"
 
 """
 

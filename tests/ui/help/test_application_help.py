@@ -1,6 +1,9 @@
 from clikit import ConsoleApplication
+from clikit.api.args import Args
+from clikit.api.args.format import ArgsFormat
 from clikit.api.args.format import Option
 from clikit.api.config import ApplicationConfig
+from clikit.args import ArgvArgs
 from clikit.ui.help import ApplicationHelp
 
 
@@ -204,7 +207,7 @@ GLOBAL OPTIONS
 
 def test_render_description(io):
     config = ApplicationConfig()
-    config.set_help("The help")
+    config.set_help("The help for {script_name}")
 
     app = ConsoleApplication(config)
     help = ApplicationHelp(app)
@@ -221,7 +224,7 @@ ARGUMENTS
   <arg>      The arguments of the command
 
 DESCRIPTION
-  The help
+  The help for console
 
 """
 
