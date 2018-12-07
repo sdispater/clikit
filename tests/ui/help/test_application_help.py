@@ -207,7 +207,7 @@ GLOBAL OPTIONS
 
 def test_render_description(io):
     config = ApplicationConfig()
-    config.set_help("The help for {script_name}")
+    config.set_help("The help for {script_name}\n\nSecond paragraph")
 
     app = ConsoleApplication(config)
     help = ApplicationHelp(app)
@@ -225,6 +225,8 @@ ARGUMENTS
 
 DESCRIPTION
   The help for console
+  
+  Second paragraph
 
 """
 

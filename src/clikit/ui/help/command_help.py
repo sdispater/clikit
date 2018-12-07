@@ -155,13 +155,15 @@ class CommandHelp(AbstractHelp):
 
     def _render_description(self, layout, help):  # type: (BlockLayout, str) -> None
         script_name = "console"
-        if self._command.application and self._command.application.config.name:
-            script_name = self._command.application.config.name
+        application = self._command.application
+        if application and application.config.name:
+            script_name = application.config.name
 
         help = help.format(script_name=script_name, command_name=self._command.name)
 
         layout.add(Paragraph("<b>DESCRIPTION</b>"))
         with layout.block():
-            layout.add(Paragraph(help))
+            for paragraph in help.split("\n"):
+                layout.add(Paragraph(paragraph))
 
         layout.add(EmptyLine())

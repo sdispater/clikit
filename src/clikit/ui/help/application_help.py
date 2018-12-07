@@ -90,6 +90,7 @@ class ApplicationHelp(AbstractHelp):
 
         layout.add(Paragraph("<b>DESCRIPTION</b>"))
         with layout.block():
-            layout.add(Paragraph(help))
+            for paragraph in help.split("\n"):
+                layout.add(Paragraph(paragraph))
 
         layout.add(EmptyLine())
