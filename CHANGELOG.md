@@ -1,5 +1,12 @@
 # Change Log
 
+## [Unreleased]
+
+### Changed
+
+- Write line methods will now always write `\n` instead of `os.linesep`.
+
+
 ## [0.2.1] - 2018-12-07
 
 ### Changed

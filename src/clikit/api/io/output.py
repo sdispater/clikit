@@ -55,13 +55,13 @@ class Output(Formatter):
         The string is formatted before it is written to the output stream.
         """
         if self._may_write(flags):
-            string = string.rstrip(os.linesep)
+            string = string.rstrip("\n")
             if self._format_output:
                 formatted = self.format(string)
             else:
                 formatted = self.remove_format(string)
 
-            self._stream.write(to_str(formatted + os.linesep))
+            self._stream.write(to_str(formatted + "\n"))
 
     def write_raw(self, string, flags=None):  # type: (str, Optional[int]) -> None
         """
@@ -75,7 +75,7 @@ class Output(Formatter):
         Writes a string to the output stream without formatting.
         """
         if self._may_write(flags):
-            self._stream.write(to_str(string.rstrip(os.linesep) + os.linesep))
+            self._stream.write(to_str(string.rstrip("\n") + "\n"))
 
     def flush(self):  # type: () -> None
         """

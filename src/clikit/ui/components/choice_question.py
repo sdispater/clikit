@@ -137,7 +137,7 @@ class ChoiceQuestion(Question):
         for key, value in enumerate(self._choices):
             messages.append(" [<comment>{:{}}</>] {}".format(key, width, value))
 
-        io.error_line(os.linesep.join(messages))
+        io.error_line("\n".join(messages))
 
         message = self._prompt
 
