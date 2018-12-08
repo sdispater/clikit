@@ -46,19 +46,19 @@ def test_default_indicator(ansi_io):
 
     expected = "\x0D\x1B[2K" + "\x0D\x1B[2K".join(output)
 
-    expected += os.linesep
+    expected += "\n"
 
     output = [" - Starting Again...", " \\ Starting Again...", " \\ Done Again..."]
 
     expected += "\x0D\x1B[2K" + "\x0D\x1B[2K".join(output)
 
-    expected += os.linesep
+    expected += "\n"
 
     output = [" - Starting Again...", " \\ Starting Again...", " - Done Again..."]
 
     expected += "\x0D\x1B[2K" + "\x0D\x1B[2K".join(output)
 
-    expected += os.linesep
+    expected += "\n"
 
     assert expected == ansi_io.fetch_error()
 
@@ -105,18 +105,18 @@ def test_explicit_format(ansi_io):
 
     expected = "\x0D\x1B[2K" + "\x0D\x1B[2K".join(output)
 
-    expected += os.linesep
+    expected += "\n"
 
     output = [" - Starting Again...", " \\ Starting Again...", " \\ Done Again..."]
 
     expected += "\x0D\x1B[2K" + "\x0D\x1B[2K".join(output)
 
-    expected += os.linesep
+    expected += "\n"
 
     output = [" - Starting Again...", " \\ Starting Again...", " - Done Again..."]
 
     expected += "\x0D\x1B[2K" + "\x0D\x1B[2K".join(output)
 
-    expected += os.linesep
+    expected += "\n"
 
     assert expected == ansi_io.fetch_error()

@@ -309,7 +309,7 @@ def test_non_decorated_output(io):
 
     bar.finish()
 
-    expected = os.linesep.join(
+    expected = "\n".join(
         [
             "   0/200 [>---------------------------]   0%",
             "  20/200 [==>-------------------------]  10%",
