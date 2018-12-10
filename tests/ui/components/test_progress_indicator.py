@@ -64,8 +64,6 @@ def test_default_indicator(ansi_io):
 
 
 def test_explicit_format(ansi_io):
-    ansi_io.set_formatter(AnsiFormatter())
-
     bar = ProgressIndicator(ansi_io, ProgressIndicator.NORMAL)
     bar.start("Starting...")
     time.sleep(0.101)

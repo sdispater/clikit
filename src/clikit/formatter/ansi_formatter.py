@@ -15,8 +15,9 @@ class AnsiFormatter(Formatter):
     A formatter that replaces style tags by ANSI format codes.
     """
 
-    def __init__(self, style_set=None):  # type: (StyleSet) -> None
+    def __init__(self, style_set=None, forced=False):  # type: (StyleSet) -> None
         self._formatter = Pastel(True)
+        self._forced = forced
 
         if style_set is None:
             style_set = DefaultStyleSet()
@@ -46,8 +47,11 @@ class AnsiFormatter(Formatter):
         with self._formatter.colorized(False):
             return self._formatter.colorize(string)
 
+    def disable_ansi(self):  # type: () -> bool
+        return False
+
     def force_ansi(self):  # type: () -> bool
-        return True
+        return self._forced
 
     def add_style(self, style):  # type: (Style) -> None
         pastel_style = StyleConverter.convert(style)

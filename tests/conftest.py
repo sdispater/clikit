@@ -11,4 +11,4 @@ def io():
 
 @pytest.fixture()
 def ansi_io():
-    return BufferedIO(formatter=AnsiFormatter())
+    return BufferedIO(formatter=AnsiFormatter(forced=True))

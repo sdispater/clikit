@@ -90,7 +90,7 @@ class DefaultApplicationConfig(ApplicationConfig):
         if args.has_token("--no-ansi"):
             output_formatter = error_formatter = PlainFormatter(style_set)
         elif args.has_token("--ansi"):
-            output_formatter = error_formatter = AnsiFormatter(style_set)
+            output_formatter = error_formatter = AnsiFormatter(style_set, True)
         else:
             if output_stream.supports_ansi():
                 output_formatter = AnsiFormatter(style_set)

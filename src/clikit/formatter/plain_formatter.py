@@ -37,6 +37,9 @@ class PlainFormatter(Formatter):
     def remove_format(self, string):  # type: (str) -> str
         return self._formatter.colorize(string)
 
+    def disable_ansi(self):  # type: () -> bool
+        return True
+
     def force_ansi(self):  # type: () -> bool
         return False
 

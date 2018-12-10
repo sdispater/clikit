@@ -15,6 +15,9 @@ class Formatter(object):
         """
         raise NotImplementedError()
 
+    def disable_ansi(self):  # type: () -> bool
+        raise NotImplementedError()
+
     def force_ansi(self):  # type: () -> bool
         raise NotImplementedError()
 

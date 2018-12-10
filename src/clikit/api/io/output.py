@@ -31,7 +31,13 @@ class Output(Formatter):
 
         self._formatter = formatter
         self._quiet = False
-        self._format_output = self._stream.supports_ansi() or formatter.force_ansi()
+
+        self._format_output = (
+            self._stream.supports_ansi()
+            and not formatter.disable_ansi()
+            or formatter.force_ansi()
+        )
+
         self._verbosity = 0
 
     def write(self, string, flags=None):  # type: (str, Optional[int]) -> None
@@ -100,9 +106,11 @@ class Output(Formatter):
         Sets the underlying stream.
         """
         self._stream = stream
-        self._format_output = (
-            self._stream.supports_ansi() or self._formatter.force_ansi()
-        )
+
+        if self._formatter.force_ansi():
+            self._format_output = True
+        else:
+            self._format_output = self._stream.supports_ansi()
 
     @property
     def stream(self):  # type: () -> OutputStream
@@ -116,7 +124,11 @@ class Output(Formatter):
         Sets the underlying formatter.
         """
         self._formatter = formatter
-        self._format_output = self._stream.supports_ansi() or formatter.force_ansi()
+
+        if formatter.force_ansi():
+            self._format_output = True
+        else:
+            self._format_output = self._stream.supports_ansi()
 
     @property
     def formatter(self):  # type: () -> Formatter

@@ -7,7 +7,6 @@ from typing import List
 from typing import Optional
 
 from clikit.api.io import IO
-from clikit.formatter import AnsiFormatter
 from clikit.utils.time import format_time
 
 
@@ -84,7 +83,7 @@ class ProgressIndicator(object):
         if not self._started:
             raise RuntimeError("Progress indicator has not yet been started.")
 
-        if not isinstance(self._io.error_output.formatter, AnsiFormatter):
+        if not self._io.error_output.supports_ansi():
             return
 
         current_time = self._get_current_time_in_milliseconds()
@@ -164,7 +163,7 @@ class ProgressIndicator(object):
         """
         Overwrites a previous message to the output.
         """
-        if isinstance(self._io.error_output.formatter, AnsiFormatter):
+        if self._io.error_output.supports_ansi():
             self._io.error("\x0D\x1B[2K")
             self._io.error(message)
         else:

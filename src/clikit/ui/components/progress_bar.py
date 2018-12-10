@@ -9,7 +9,6 @@ from clikit.api.io import IO
 from clikit.api.io.flags import DEBUG
 from clikit.api.io.flags import VERBOSE
 from clikit.api.io.flags import VERY_VERBOSE
-from clikit.formatter import AnsiFormatter
 from clikit.utils.time import format_time
 
 
@@ -53,7 +52,7 @@ class ProgressBar(object):
         self._last_messages_length = 0
         self._should_overwrite = True
 
-        if not isinstance(self._io.error_output.formatter, AnsiFormatter):
+        if not self._io.error_output.supports_ansi():
             # Disable overwrite when output does not support ANSI codes.
             self._should_overwrite = False
 

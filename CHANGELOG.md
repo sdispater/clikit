@@ -1,5 +1,12 @@
 # Change Log
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed handling of ANSI support detection in output.
+
+
 ## [0.2.2] - 2018-12-08
 
 ### Changed
