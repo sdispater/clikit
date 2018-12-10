@@ -3,4 +3,4 @@ from .console_application import ConsoleApplication
 from .config.default_application_config import DefaultApplicationConfig
 
 
-__version__ = "0.2.2"
+__version__ = "0.2.3"
