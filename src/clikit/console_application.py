@@ -144,7 +144,7 @@ class ConsoleApplication(BaseApplication):
         return status_code
 
     def exception_to_exit_code(self, e):  # type: (Exception) -> int
-        if not hasattr(e, "code"):
+        if not hasattr(e, "code") or not isinstance(e, int):
             return 1
 
         return min(max(e.code, 1), 255)
