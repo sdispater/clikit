@@ -66,7 +66,7 @@ class DefaultApplicationConfig(ApplicationConfig):
             c.default()
             c.set_description("Display the manual of a command")
             c.add_argument("command", Argument.OPTIONAL, "The command name")
-            c.set_handler(HelpTextHandler())
+            c.set_handler(HelpTextHandler(self.default_command_resolver))
 
     def create_io(
         self,

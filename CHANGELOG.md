@@ -1,5 +1,12 @@
 # Change Log
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed `help` command not displaying help for sub commands.
+
+
 ## [0.2.3] - 2018-12-10
 
 ### Fixed
