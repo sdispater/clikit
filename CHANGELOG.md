@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fixed `help` command not displaying help for sub commands.
+- Fixed possible errors for raised exceptions with a non-int `code` attribute.
 
 
 ## [0.2.3] - 2018-12-10
