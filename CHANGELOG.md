@@ -1,5 +1,12 @@
 # Change Log
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed similar command names suggestions.
+
+
 ## [0.2.4] - 2019-05-11
 
 ### Fixed

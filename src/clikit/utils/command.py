@@ -13,6 +13,7 @@ def find_similar_command_names(
     """
     threshold = 1e3
     distance_by_name = {}
+    suggested_names = []
 
     # Include aliases in the search
     actual_names = commands.get_names(True)
@@ -22,20 +23,23 @@ def find_similar_command_names(
         distance = levenshtein(name, actual_name)
 
         is_similar = distance <= len(name) / 3
+        print(actual_name, actual_name.find(name))
         is_sub_string = actual_name.find(name) != -1
 
         if is_similar or is_sub_string:
-            distance_by_name[actual_name] = distance
+            distance_by_name[actual_name] = (
+                distance,
+                actual_name.find(name) if is_sub_string else float("inf"),
+            )
 
-        # Only keep results with a distance below the threshold
-        distance_by_name = {
-            k: v for k, v in distance_by_name.items() if v < 2 * threshold
-        }
+    # Only keep results with a distance below the threshold
+    distance_by_name = {
+        k: v for k, v in distance_by_name.items() if v[0] < 2 * threshold
+    }
 
-        # Display results with shortest distance first
-        suggested_names = []
-        for k, v in sorted(distance_by_name.items(), key=lambda _, v: v):
-            if k not in suggested_names:
-                suggested_names.append(k)
+    # Display results with shortest distance first
+    for k, v in sorted(distance_by_name.items(), key=lambda i: (i[1][0], i[1][1])):
+        if k not in suggested_names:
+            suggested_names.append(k)
 
-        return suggested_names
+    return suggested_names
