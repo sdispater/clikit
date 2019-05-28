@@ -220,3 +220,6 @@ class IO(Formatter):
         Removes the format tags from the given string.
         """
         return self._output.formatter.remove_format(string)
+
+    def section(self):
+        return IO(self._input, self._output.section(), self._error_output.section())

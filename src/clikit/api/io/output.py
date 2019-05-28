@@ -39,8 +39,11 @@ class Output(Formatter):
         )
 
         self._verbosity = 0
+        self._section_outputs = []
 
-    def write(self, string, flags=None):  # type: (str, Optional[int]) -> None
+    def write(
+        self, string, flags=None, new_line=False
+    ):  # type: (str, Optional[int], bool) -> None
         """
         Writes a string to the output stream.
 
@@ -52,6 +55,9 @@ class Output(Formatter):
             else:
                 formatted = self.remove_format(string)
 
+            if new_line:
+                formatted += "\n"
+
             self._stream.write(to_str(formatted))
 
     def write_line(self, string, flags=None):  # type: (str, Optional[int]) -> None
@@ -60,14 +66,7 @@ class Output(Formatter):
 
         The string is formatted before it is written to the output stream.
         """
-        if self._may_write(flags):
-            string = string.rstrip("\n")
-            if self._format_output:
-                formatted = self.format(string)
-            else:
-                formatted = self.remove_format(string)
-
-            self._stream.write(to_str(formatted + "\n"))
+        self.write(string, flags=flags, new_line=True)
 
     def write_raw(self, string, flags=None):  # type: (str, Optional[int]) -> None
         """
@@ -199,6 +198,11 @@ class Output(Formatter):
 
     def supports_ansi(self):  # type: () -> bool
         return self._format_output
+
+    def section(self):  # type: (SectionOutput) -> SectionOutput
+        from .section_output import SectionOutput
+
+        return SectionOutput(self._stream, self._section_outputs, self._formatter)
 
     def _may_write(self, flags):  # type: (int) -> bool
         """

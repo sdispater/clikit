@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added support for displaying multiple, independent progress bars.
+
 ### Fixed
 
 - Fixed similar command names suggestions.

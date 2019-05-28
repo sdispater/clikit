@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
-
 import pytest
 
 from clikit.ui.components import ProgressBar
@@ -417,5 +415,51 @@ def test_regress_below_min(ansi_io):
     ]
 
     expected = "\x0D" + "\x0D".join(output)
+
+    assert expected == ansi_io.fetch_error()
+
+
+def test_overwrite_with_section_output(ansi_io):
+    bar = ProgressBar(ansi_io.section(), 50)
+    bar.start()
+    bar.display()
+    bar.advance()
+    bar.advance()
+
+    output = [
+        "  0/50 [>---------------------------]   0%",
+        "  0/50 [>---------------------------]   0%",
+        "  1/50 [>---------------------------]   2%",
+        "  2/50 [=>--------------------------]   4%",
+    ]
+
+    expected = "\n\x1b[1A\x1b[0J".join(output) + "\n"
+
+    assert expected == ansi_io.fetch_error()
+
+
+def test_overwrite_multiple_progress_bars_with_section_outputs(ansi_io):
+    output1 = ansi_io.section()
+    output2 = ansi_io.section()
+
+    bar1 = ProgressBar(output1, 50)
+    bar2 = ProgressBar(output2, 50)
+
+    bar1.start()
+    bar2.start()
+
+    bar2.advance()
+    bar1.advance()
+
+    output = [
+        "  0/50 [>---------------------------]   0%",
+        "  0/50 [>---------------------------]   0%",
+        "\x1b[1A\x1b[0J  1/50 [>---------------------------]   2%",
+        "\x1b[2A\x1b[0J  1/50 [>---------------------------]   2%",
+        "\x1b[1A\x1b[0J  1/50 [>---------------------------]   2%",
+        "  1/50 [>---------------------------]   2%",
+    ]
+
+    expected = "\n".join(output) + "\n"
 
     assert expected == ansi_io.fetch_error()

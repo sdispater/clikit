@@ -9,6 +9,7 @@ from clikit.api.io import IO
 from clikit.api.io.flags import DEBUG
 from clikit.api.io.flags import VERBOSE
 from clikit.api.io.flags import VERY_VERBOSE
+from clikit.api.io.section_output import SectionOutput
 from clikit.utils.time import format_time
 
 
@@ -274,14 +275,22 @@ class ProgressBar(object):
                     lines[i] = line.ljust(self._last_messages_length, "\x20")
 
         if self._should_overwrite:
-            # move back to the beginning of the progress bar before redrawing it
-            self._io.error("\x0D")
+            if isinstance(self._io.error_output, SectionOutput):
+                lines_to_clear = (
+                    int(math.floor(len(lines) / self._io.terminal_dimensions.width))
+                    + self._format_line_count
+                    + 1
+                )
+                self._io.error_output.clear(lines_to_clear)
+            else:
+                # move back to the beginning of the progress bar before redrawing it
+                self._io.error("\x0D")
+
+                if self._format_line_count:
+                    self._io.error("\033[{}A".format(self._format_line_count))
         elif self._step > 0:
             # move to new line
             self._io.error_line("")
-
-        if self._format_line_count:
-            self._io.error("\033[{}A".format(self._format_line_count))
 
         self._io.error("\n".join(lines))
         self._io.error_output.flush()
