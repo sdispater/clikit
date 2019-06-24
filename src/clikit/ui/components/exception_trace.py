@@ -1,7 +1,6 @@
 import ast
 import inspect
 import keyword
-import math
 import sys
 import traceback
 
@@ -37,18 +36,23 @@ class ExceptionTrace(object):
         self._exception = exception
         self._exc_info = sys.exc_info()
 
-    def render(self, io):  # type: (IO) -> None
+    def render(self, io, simple=False):  # type: (IO, bool) -> None
         if hasattr(self._exception, "__traceback__"):
             tb = self._exception.__traceback__
         else:
             tb = self._exc_info[2]
 
-        title = "\n[<error>{}</error>]\n<error>{}</error>".format(
-            self._exception.__class__.__name__, str(self._exception)
-        )
+        title = ""
+        if not simple:
+            title += "\n[<error>{}</error>]\n".format(
+                self._exception.__class__.__name__
+            )
+
+        title += "<error>{}</error>".format(str(self._exception))
+
         io.write_line(title)
 
-        if io.is_verbose():
+        if not simple and io.is_verbose():
             io.write_line("")
             self._render_traceback(io, tb)
 

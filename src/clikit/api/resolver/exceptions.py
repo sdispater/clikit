@@ -1,7 +1,8 @@
+from clikit.api.exceptions import CliKitException
 from clikit.utils.command import find_similar_command_names
 
 
-class CannotResolveCommandException(RuntimeError):
+class CannotResolveCommandException(RuntimeError, CliKitException):
     @classmethod
     def name_not_found(cls, name, commands):
         message = 'The command "{}" is not defined.'.format(name)

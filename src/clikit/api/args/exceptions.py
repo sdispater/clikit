@@ -1,3 +1,6 @@
+from clikit.api.exceptions import CliKitException
+
+
 class CannotAddOptionException(RuntimeError):
     @classmethod
     def already_exists(cls, name):
@@ -41,7 +44,7 @@ class NoSuchArgumentException(RuntimeError):
         super(NoSuchArgumentException, self).__init__(message)
 
 
-class CannotParseArgsException(RuntimeError):
+class CannotParseArgsException(RuntimeError, CliKitException):
     @classmethod
     def too_many_arguments(cls):
         return cls("Too many arguments.")

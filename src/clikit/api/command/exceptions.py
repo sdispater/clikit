@@ -1,4 +1,7 @@
-class NoSuchCommandException(RuntimeError):
+from clikit.api.exceptions import CliKitException
+
+
+class NoSuchCommandException(RuntimeError, CliKitException):
     def __init__(self, name):  # type: (str) -> None
         message = 'The command "{}" does not exist.'.format(name)
 

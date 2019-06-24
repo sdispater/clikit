@@ -11,6 +11,7 @@ from .api.config.command_config import CommandConfig
 from .api.event import ConfigEvent
 from .api.event import ConsoleEvents
 from .api.event import PreResolveEvent
+from .api.exceptions import CliKitException
 from .api.io import IO
 from .api.io import InputStream
 from .api.io import OutputStream
@@ -134,7 +135,7 @@ class ConsoleApplication(BaseApplication):
                 raise
 
             trace = ExceptionTrace(e)
-            trace.render(io)
+            trace.render(io, simple=isinstance(e, CliKitException))
 
             status_code = self.exception_to_exit_code(e)
 
