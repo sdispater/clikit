@@ -1,6 +1,6 @@
 # Change Log
 
-## [Unreleased]
+## [0.3.0] - 2019-06-24
 
 ### Added
 
@@ -60,7 +60,8 @@
 - Fixed the progress indicator component.
 
 
-[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.2.4...master
+[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.3.0...master
+[0.3.0]: https://github.com/sdispater/tomlkit/releases/tag/0.3.0
 [0.2.4]: https://github.com/sdispater/tomlkit/releases/tag/0.2.4
 [0.2.3]: https://github.com/sdispater/tomlkit/releases/tag/0.2.3
 [0.2.2]: https://github.com/sdispater/tomlkit/releases/tag/0.2.2
