@@ -3,6 +3,7 @@ import re
 from contextlib import contextmanager
 
 from typing import Callable
+from typing import ContextManager
 from typing import List
 from typing import Optional
 
@@ -184,7 +185,7 @@ class ApplicationConfig(Config):
         self.style_set.remove(tag)
 
     @contextmanager
-    def command(self, name):  # type: (str) -> CommandConfig
+    def command(self, name):  # type: (str) -> ContextManager[CommandConfig]
         command_config = CommandConfig(name)
         self.add_command_config(command_config)
 
