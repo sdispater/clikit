@@ -80,6 +80,9 @@ class ApplicationHelp(AbstractHelp):
         layout.add(EmptyLine())
 
     def _render_command(self, layout, command):  # type: (BlockLayout, Command) -> None
+        if command.config.is_hidden():
+            return
+
         description = command.config.description
         name = "<c1>{}</c1>".format(command.name)
 

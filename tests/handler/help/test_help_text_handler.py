@@ -70,6 +70,47 @@ AVAILABLE COMMANDS
     assert expected == io.fetch_output()
 
 
+def test_render_for_application_does_not_display_hidden_commands(app, io):
+    app.get_command("command").config.hide()
+
+    help_command = app.get_command("help")
+    handler = help_command.config.handler
+
+    raw_args = StringArgs("")
+    args = Args(help_command.args_format, raw_args)
+    status = handler.handle(args, io, app.get_command("command"))
+
+    expected = """\
+The Application version 1.2.3
+
+USAGE
+  console [-h] [-q] [-v [<...>]] [-V] [--ansi] [--no-ansi] [-n] <command>
+          [<arg1>] ... [<argN>]
+
+ARGUMENTS
+  <command>              The command to execute
+  <arg>                  The arguments of the command
+
+GLOBAL OPTIONS
+  -h (--help)            Display this help message
+  -q (--quiet)           Do not output any message
+  -v (--verbose)         Increase the verbosity of messages: "-v" for normal
+                         output, "-vv" for more verbose output and "-vvv" for
+                         debug
+  -V (--version)         Display this application version
+  --ansi                 Force ANSI output
+  --no-ansi              Disable ANSI output
+  -n (--no-interaction)  Do not ask any interactive question
+
+AVAILABLE COMMANDS
+  help                   Display the manual of a command
+
+"""
+
+    assert 0 == status
+    assert expected == io.fetch_output()
+
+
 def test_render_sub_command(app, io):
     help_command = app.get_command("help")
     handler = help_command.config.handler
@@ -169,6 +210,45 @@ ARGUMENTS
 
 OPTIONS
   -o (--opt)             Description of "opt"
+
+GLOBAL OPTIONS
+  -h (--help)            Display this help message
+  -q (--quiet)           Do not output any message
+  -v (--verbose)         Increase the verbosity of messages: "-v" for normal
+                         output, "-vv" for more verbose output and "-vvv" for
+                         debug
+  -V (--version)         Display this application version
+  --ansi                 Force ANSI output
+  --no-ansi              Disable ANSI output
+  -n (--no-interaction)  Do not ask any interactive question
+
+"""
+
+    assert 0 == status
+    assert expected == io.fetch_output()
+
+
+def test_render_parent_command_does_not_display_hidden_sub_commands(app, io):
+    app.get_command("command").config.get_sub_command_config("delete").hide()
+
+    help_command = app.get_command("help")
+    handler = help_command.config.handler
+
+    raw_args = StringArgs("help command")
+    args = Args(help_command.args_format, raw_args)
+    args.set_argument("command", "command")
+    status = handler.handle(args, io, app.get_command("command"))
+
+    expected = """\
+USAGE
+      console command
+  or: console command add [<argument>]
+
+COMMANDS
+  add
+    Description of "add"
+
+    <argument>           Description of "argument"
 
 GLOBAL OPTIONS
   -h (--help)            Display this help message

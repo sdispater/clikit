@@ -62,6 +62,9 @@ class CommandHelp(AbstractHelp):
 
         # Add remaining sub-commands
         for sub_command in command.sub_commands:
+            if sub_command.config.is_hidden():
+                continue
+
             # Don't duplicate default commands
             if not sub_command.config.is_default():
                 formats_to_print.append((sub_command.args_format, False))
@@ -99,6 +102,9 @@ class CommandHelp(AbstractHelp):
         self, layout, command
     ):  # type: (BlockLayout, Command) -> None
         config = command.config
+        if config.is_hidden():
+            return
+
         description = config.description
         help = config.help
         arguments = command.args_format.get_arguments(False)
