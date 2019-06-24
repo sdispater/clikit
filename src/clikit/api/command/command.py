@@ -47,6 +47,13 @@ class Command(object):
         return self._short_name
 
     @property
+    def full_name(self):  # type: () -> str
+        if self._parent_command:
+            return "{} {}".format(str(self._parent_command.full_name), self._name)
+
+        return self._name
+
+    @property
     def aliases(self):  # type: () -> List[str]
         return self._aliases
 
@@ -158,3 +165,6 @@ class Command(object):
         handler_method = self._config.handler_method
 
         return getattr(handler, handler_method)(args, io, self)
+
+    def __repr__(self):  # type: () -> str
+        return "<Command {}>".format(self.full_name)
