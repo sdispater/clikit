@@ -23,7 +23,6 @@ def find_similar_command_names(
         distance = levenshtein(name, actual_name)
 
         is_similar = distance <= len(name) / 3
-        print(actual_name, actual_name.find(name))
         is_sub_string = actual_name.find(name) != -1
 
         if is_similar or is_sub_string:
