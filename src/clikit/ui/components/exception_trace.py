@@ -63,7 +63,7 @@ class ExceptionTrace(object):
 
             tb = tb.tb_next
 
-        io.write_line("<comment>Traceback (most recent call last):</comment>")
+        io.write_line("<b>Traceback (most recent call last):</b>")
         io.write_line("".join(traceback.format_list(frames)))
 
     def _format_traceback_frame(self, io, tb):  # type: (IO, ...) -> Tuple[Any]
@@ -82,9 +82,9 @@ class ExceptionTrace(object):
             formatted = line
 
         return (
-            io.format("<info>{}</info>".format(filename)),
-            lineno,
-            function,
+            io.format("<c1>{}</c1>".format(filename)),
+            "<fg=blue;options=bold>{}</>".format(lineno),
+            "<b>{}</b>".format(function),
             formatted,
         )
 
