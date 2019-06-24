@@ -24,6 +24,7 @@ from clikit.io.input_stream import StandardInputStream
 from clikit.io.output_stream import ErrorOutputStream
 from clikit.io.output_stream import StandardOutputStream
 from clikit.resolver.default_resolver import DefaultResolver
+from clikit.resolver.help_resolver import HelpResolver
 from clikit.ui.components import NameVersion
 
 
@@ -65,8 +66,10 @@ class DefaultApplicationConfig(ApplicationConfig):
         with self.command("help") as c:
             c.default()
             c.set_description("Display the manual of a command")
-            c.add_argument("command", Argument.OPTIONAL, "The command name")
-            c.set_handler(HelpTextHandler(self.default_command_resolver))
+            c.add_argument(
+                "command", Argument.OPTIONAL | Argument.MULTI_VALUED, "The command name"
+            )
+            c.set_handler(HelpTextHandler(HelpResolver()))
 
     def create_io(
         self,

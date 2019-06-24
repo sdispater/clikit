@@ -9,6 +9,7 @@
 ### Fixed
 
 - Fixed similar command names suggestions.
+- Fixed the `help` command not displaying the help text of commands.
 
 
 ## [0.2.4] - 2019-05-11

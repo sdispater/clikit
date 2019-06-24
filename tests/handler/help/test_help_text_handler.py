@@ -104,3 +104,84 @@ GLOBAL OPTIONS
 
     assert 0 == status
     assert expected == io.fetch_output()
+
+
+def test_render_parent_command_with_help_command_argument(app, io):
+    help_command = app.get_command("help")
+    handler = help_command.config.handler
+
+    raw_args = StringArgs("help command")
+    args = Args(help_command.args_format, raw_args)
+    args.set_argument("command", "command")
+    status = handler.handle(args, io, app.get_command("command"))
+
+    expected = """\
+USAGE
+      console command
+  or: console command add [<argument>]
+  or: console command delete [-o] [<sub-arg>]
+
+COMMANDS
+  add
+    Description of "add"
+
+    <argument>           Description of "argument"
+
+  delete
+    Description of "delete"
+
+    <sub-arg>            Description of "sub-arg"
+
+    -o (--opt)           Description of "opt"
+
+GLOBAL OPTIONS
+  -h (--help)            Display this help message
+  -q (--quiet)           Do not output any message
+  -v (--verbose)         Increase the verbosity of messages: "-v" for normal
+                         output, "-vv" for more verbose output and "-vvv" for
+                         debug
+  -V (--version)         Display this application version
+  --ansi                 Force ANSI output
+  --no-ansi              Disable ANSI output
+  -n (--no-interaction)  Do not ask any interactive question
+
+"""
+
+    assert 0 == status
+    assert expected == io.fetch_output()
+
+
+def test_render_sub_command_with_help_command_argument(app, io):
+    help_command = app.get_command("help")
+    handler = help_command.config.handler
+
+    raw_args = StringArgs("help command delete")
+    args = Args(help_command.args_format, raw_args)
+    args.set_argument("command", "command")
+    status = handler.handle(args, io, app.get_command("command"))
+
+    expected = """\
+USAGE
+  console command delete [-o] [<sub-arg>]
+
+ARGUMENTS
+  <sub-arg>              Description of "sub-arg"
+
+OPTIONS
+  -o (--opt)             Description of "opt"
+
+GLOBAL OPTIONS
+  -h (--help)            Display this help message
+  -q (--quiet)           Do not output any message
+  -v (--verbose)         Increase the verbosity of messages: "-v" for normal
+                         output, "-vv" for more verbose output and "-vvv" for
+                         debug
+  -V (--version)         Display this application version
+  --ansi                 Force ANSI output
+  --no-ansi              Disable ANSI output
+  -n (--no-interaction)  Do not ask any interactive question
+
+"""
+
+    assert 0 == status
+    assert expected == io.fetch_output()
