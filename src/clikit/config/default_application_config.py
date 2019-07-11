@@ -144,7 +144,7 @@ class DefaultApplicationConfig(ApplicationConfig):
         args = event.raw_args
         application = event.application
 
-        if args.has_token("-h") or args.has_token("--help"):
+        if args.has_option_token("-h") or args.has_option_token("--help"):            
             command = application.get_command("help")
 
             # Enable lenient parsing
