@@ -90,9 +90,9 @@ class DefaultApplicationConfig(ApplicationConfig):
 
         style_set = application.config.style_set
 
-        if args.has_token("--no-ansi"):
+        if args.has_option_token("--no-ansi"):
             output_formatter = error_formatter = PlainFormatter(style_set)
-        elif args.has_token("--ansi"):
+        elif args.has_option_token("--ansi"):
             output_formatter = error_formatter = AnsiFormatter(style_set, True)
         else:
             if output_stream.supports_ansi():
@@ -111,17 +111,17 @@ class DefaultApplicationConfig(ApplicationConfig):
             Output(error_stream, error_formatter),
         )
 
-        if args.has_token("-vvv") or self.is_debug():
+        if args.has_option_token("-vvv") or self.is_debug():
             io.set_verbosity(DEBUG)
-        elif args.has_token("-vv"):
+        elif args.has_option_token("-vv"):
             io.set_verbosity(VERY_VERBOSE)
-        elif args.has_token("-v"):
+        elif args.has_option_token("-v"):
             io.set_verbosity(VERBOSE)
 
-        if args.has_token("--quiet") or args.has_token("-q"):
+        if args.has_option_token("--quiet") or args.has_option_token("-q"):
             io.set_quiet(True)
 
-        if args.has_token("--no-interaction") or args.has_token("-n"):
+        if args.has_option_token("--no-interaction") or args.has_option_token("-n"):
             io.set_interactive(False)
 
         return io
@@ -144,7 +144,7 @@ class DefaultApplicationConfig(ApplicationConfig):
         args = event.raw_args
         application = event.application
 
-        if args.has_option_token("-h") or args.has_option_token("--help"):            
+        if args.has_option_token("-h") or args.has_option_token("--help"):
             command = application.get_command("help")
 
             # Enable lenient parsing
