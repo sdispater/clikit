@@ -116,7 +116,13 @@ class Command(object):
         return self.handle(self.parse(args), io)
 
     def handle(self, args, io):  # type: (Args, IO) -> int
-        status_code = self._do_handle(args, io)
+        try:
+            status_code = self._do_handle(args, io)
+        except KeyboardInterrupt:
+            if io.is_debug():
+                raise
+
+            status_code = 1
 
         # Any empty value is considered a success
         if not status_code:

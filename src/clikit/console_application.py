@@ -130,6 +130,8 @@ class ConsoleApplication(BaseApplication):
             parsed_args = resolved_command.args
 
             status_code = command.handle(parsed_args, io)
+        except KeyboardInterrupt:
+            status_code = 1
         except Exception as e:
             if not self._config.is_exception_caught():
                 raise

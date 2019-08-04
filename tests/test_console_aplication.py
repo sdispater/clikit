@@ -1,3 +1,5 @@
+from typing import Generator
+
 import pytest
 
 from clikit import ConsoleApplication
@@ -22,7 +24,7 @@ class ApplicationConfig(BaseApplicationConfig):
 
 
 @pytest.fixture()
-def config():  # type: () -> ApplicationConfig
+def config():  # type: () -> Generator[ApplicationConfig]
     config = ApplicationConfig()
     config.set_catch_exceptions(False)
     config.set_terminate_after_run(False)
@@ -260,3 +262,21 @@ def test_run_command(config, arg_string, config_callback):
     assert 123 == app.run(args, input, output, error_output)
     assert "line1\n" == output.fetch()
     assert "line2" == error_output.fetch()
+
+
+def test_run_with_keyboard_interrupt(config):  # type: (ApplicationConfig) -> None
+    def callback(_, io):
+        raise KeyboardInterrupt()
+
+    config.create_command("interrupted").set_handler(CallbackHandler(callback))
+    app = ConsoleApplication(config)
+
+    output = BufferedOutputStream()
+    error_output = BufferedOutputStream()
+
+    assert 1 == app.run(
+        StringArgs("interrupted"), StringInputStream(""), output, error_output
+    )
+
+    assert "" == output.fetch()
+    assert "" == error_output.fetch()
