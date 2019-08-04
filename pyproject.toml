@@ -3,14 +3,15 @@ name = "clikit"
 version = "0.3.1"
 description = "CliKit is a group of utilities to build beautiful and testable command line interfaces."
 authors = ["Sébastien Eustace <sebastien@eustace.io>"]
-
 license = "MIT"
-
 readme = "README.md"
-
 repository = "https://github.com/sdispater/clikit"
-
 keywords = ["packaging", "dependency", "poetry"]
+
+packages = [
+    {include = "clikit", from = "src"},
+    {include = "tests", format = "sdist"}
+]
 
 [tool.poetry.dependencies]
 python = "~2.7 || ^3.4"
