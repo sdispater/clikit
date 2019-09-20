@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.3.2] - 2019-09-20
+
+### Fixed
+
+- Fixed handling of `KeyboardInterrupt` exceptions.
+
+
 ## [0.3.1] - 2019-06-24
 
 ### Fixed
@@ -67,7 +74,8 @@
 - Fixed the progress indicator component.
 
 
-[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.3.1...master
+[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.3.2...master
+[0.3.2]: https://github.com/sdispater/tomlkit/releases/tag/0.3.2
 [0.3.1]: https://github.com/sdispater/tomlkit/releases/tag/0.3.1
 [0.3.0]: https://github.com/sdispater/tomlkit/releases/tag/0.3.0
 [0.2.4]: https://github.com/sdispater/tomlkit/releases/tag/0.2.4
