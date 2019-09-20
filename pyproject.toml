@@ -10,7 +10,9 @@ keywords = ["packaging", "dependency", "poetry"]
 
 packages = [
     {include = "clikit", from = "src"},
-    {include = "tests", format = "sdist"}
+    # This trips up pip when installing in editable mode
+    # so until it's fixed in Poetry we have to comment
+    # {include = "tests", format = "sdist"}
 ]
 
 [tool.poetry.dependencies]
