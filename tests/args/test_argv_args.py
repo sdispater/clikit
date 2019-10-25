@@ -42,6 +42,33 @@ def test_has_token():
     assert not args.has_token("foo")
 
 
+def test_has_option_token():
+    args = ArgvArgs(
+        [
+            "console",
+            "server",
+            "add",
+            "--port",
+            "80",
+            "localhost",
+            "--",
+            "-h",
+            "--test",
+            "remainder",
+        ]
+    )
+
+    assert args.has_option_token("server")
+    assert args.has_option_token("add")
+    assert args.has_option_token("--port")
+    assert args.has_option_token("80")
+    assert args.has_option_token("localhost")
+    assert not args.has_option_token("console")
+    assert not args.has_option_token("-h")
+    assert not args.has_option_token("--test")
+    assert not args.has_option_token("remainder")
+
+
 def test_to_string():
     args = ArgvArgs(["console", "server", "add", "--port", "80", "localhost"])
 
