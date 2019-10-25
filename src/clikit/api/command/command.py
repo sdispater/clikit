@@ -5,7 +5,7 @@ from clikit.api.args.args import Args
 from clikit.api.args.raw_args import RawArgs
 from clikit.api.args.format.args_format import ArgsFormat
 from clikit.api.config.command_config import CommandConfig
-from clikit.api.event import ConsoleEvents
+from clikit.api.event import PRE_HANDLE
 from clikit.api.event import PreHandleEvent
 from clikit.api.io import IO
 
@@ -158,11 +158,9 @@ class Command(object):
             self._named_sub_commands.add(command)
 
     def _do_handle(self, args, io):  # type: (Args, IO) -> Optional[int]
-        if self._dispatcher and self._dispatcher.has_listeners(
-            ConsoleEvents.PRE_HANDLE.value
-        ):
+        if self._dispatcher and self._dispatcher.has_listeners(PRE_HANDLE):
             event = PreHandleEvent(args, io, self)
-            self._dispatcher.dispatch(ConsoleEvents.PRE_HANDLE.value, event)
+            self._dispatcher.dispatch(PRE_HANDLE, event)
 
             if event.is_handled():
                 return event.status_code

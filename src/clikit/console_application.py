@@ -8,8 +8,9 @@ from .api.command import CommandCollection
 from .api.command.exceptions import CannotAddCommandException
 from .api.config.application_config import ApplicationConfig
 from .api.config.command_config import CommandConfig
+from .api.event import CONFIG
+from .api.event import PRE_RESOLVE
 from .api.event import ConfigEvent
-from .api.event import ConsoleEvents
 from .api.event import PreResolveEvent
 from .api.exceptions import CliKitException
 from .api.io import IO
@@ -37,8 +38,8 @@ class ConsoleApplication(BaseApplication):
 
         try:
             dispatcher = config.dispatcher
-            if dispatcher and dispatcher.has_listeners(ConsoleEvents.CONFIG.value):
-                dispatcher.dispatch(ConsoleEvents.CONFIG.value, ConfigEvent(config))
+            if dispatcher and dispatcher.has_listeners(CONFIG):
+                dispatcher.dispatch(CONFIG, ConfigEvent(config))
 
             self._config = config
             self._dispatcher = config.dispatcher
@@ -98,11 +99,9 @@ class ConsoleApplication(BaseApplication):
         return not self._default_commands.is_empty()
 
     def resolve_command(self, args):  # type: (RawArgs) -> ResolvedCommand
-        if self._dispatcher and self._dispatcher.has_listeners(
-            ConsoleEvents.PRE_RESOLVE.value
-        ):
+        if self._dispatcher and self._dispatcher.has_listeners(PRE_RESOLVE):
             event = PreResolveEvent(args, self)
-            self._dispatcher.dispatch(ConsoleEvents.PRE_RESOLVE.value, event)
+            self._dispatcher.dispatch(PRE_RESOLVE, event)
 
             resolved_command = event.resolved_command
             if resolved_command:

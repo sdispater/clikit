@@ -1,10 +1,5 @@
-from enum import Enum
+PRE_RESOLVE = "pre-resolve"
 
+PRE_HANDLE = "pre-handle"
 
-class ConsoleEvents(Enum):
-
-    PRE_RESOLVE = "pre-resolve"
-
-    PRE_HANDLE = "pre-handle"
-
-    CONFIG = "config"
+CONFIG = "config"

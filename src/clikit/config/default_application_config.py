@@ -2,7 +2,8 @@ from clikit.api.config.application_config import ApplicationConfig
 from clikit.api.args.raw_args import RawArgs
 from clikit.api.args.format.argument import Argument
 from clikit.api.args.format.option import Option
-from clikit.api.event import ConsoleEvents
+from clikit.api.event import PRE_HANDLE
+from clikit.api.event import PRE_RESOLVE
 from clikit.api.event import EventDispatcher
 from clikit.api.event import PreHandleEvent
 from clikit.api.event import PreResolveEvent
@@ -35,10 +36,8 @@ class DefaultApplicationConfig(ApplicationConfig):
 
     def configure(self):
         self.set_io_factory(self.create_io)
-        self.add_event_listener(
-            ConsoleEvents.PRE_RESOLVE.value, self.resolve_help_command
-        )
-        self.add_event_listener(ConsoleEvents.PRE_HANDLE.value, self.print_version)
+        self.add_event_listener(PRE_RESOLVE, self.resolve_help_command)
+        self.add_event_listener(PRE_HANDLE, self.print_version)
 
         self.add_option("help", "h", Option.NO_VALUE, "Display this help message")
         self.add_option("quiet", "q", Option.NO_VALUE, "Do not output any message")
