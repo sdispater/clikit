@@ -23,3 +23,5 @@ test.py
 /test
 poetry.lock
 .pytest_cache
+pip-wheel-metadata
+setup.py
