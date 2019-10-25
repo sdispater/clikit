@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.4.0] - 2019-10-25
+
+### Changed
+
+- Changed the way event names are stored and exposed.
+
+
+### Fixed
+
+- Fixed parsing of options after a `--` token.
+
+
 ## [0.3.2] - 2019-09-20
 
 ### Fixed
@@ -74,7 +86,8 @@
 - Fixed the progress indicator component.
 
 
-[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.3.2...master
+[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.4.0...master
+[0.4.0]: https://github.com/sdispater/tomlkit/releases/tag/0.4.0
 [0.3.2]: https://github.com/sdispater/tomlkit/releases/tag/0.3.2
 [0.3.1]: https://github.com/sdispater/tomlkit/releases/tag/0.3.1
 [0.3.0]: https://github.com/sdispater/tomlkit/releases/tag/0.3.0
