@@ -3,7 +3,11 @@ import re
 from contextlib import contextmanager
 
 from typing import Callable
-from typing import ContextManager
+
+try:
+    from typing import ContextManager
+except ImportError:
+    from typing_extensions import ContextManager
 from typing import List
 from typing import Optional
 
