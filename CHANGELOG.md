@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.4.1] - 2019-12-06
+
+### Fixed
+
+- Fixed the rendering of exception traces on Python 2.7
+
+
 ## [0.4.0] - 2019-10-25
 
 ### Changed
@@ -86,7 +93,8 @@
 - Fixed the progress indicator component.
 
 
-[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.4.0...master
+[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.4.1...master
+[0.4.1]: https://github.com/sdispater/tomlkit/releases/tag/0.4.1
 [0.4.0]: https://github.com/sdispater/tomlkit/releases/tag/0.4.0
 [0.3.2]: https://github.com/sdispater/tomlkit/releases/tag/0.3.2
 [0.3.1]: https://github.com/sdispater/tomlkit/releases/tag/0.3.1
