@@ -5,6 +5,7 @@ import sys
 import traceback
 
 from clikit.api.io import IO
+from clikit.utils._compat import PY2
 
 
 class ExceptionTrace(object):
@@ -83,7 +84,7 @@ class ExceptionTrace(object):
 
         return (
             io.format("<c1>{}</c1>".format(filename)),
-            "<fg=blue;options=bold>{}</>".format(lineno),
+            "<fg=blue;options=bold>{}</>".format(lineno) if not PY2 else lineno,
             "<b>{}</b>".format(function),
             formatted,
         )

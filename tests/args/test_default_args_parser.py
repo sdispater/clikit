@@ -159,7 +159,7 @@ def test_parse_fails_if_missing_required_argument_with_missing_command_name(pars
 
 
 def test_parse_does_not_fail_if_missing_required_argument_with_missing_command_name_and_lenient(
-    parser
+    parser,
 ):
     builder = ArgsFormatBuilder()
     server = CommandName("server")
@@ -214,7 +214,7 @@ def test_parse_fail_if_too_many_arguments_with_missing_command_name(parser):
 
 
 def test_parse_does_not_fail_if_too_many_arguments_with_missing_command_name_and_lenient(
-    parser
+    parser,
 ):
     builder = ArgsFormatBuilder()
     server = CommandName("server")

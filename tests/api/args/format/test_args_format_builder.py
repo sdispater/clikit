@@ -124,7 +124,7 @@ def test_add_command_option_preserves_existing_options(builder):
 
 
 def test_add_command_fails_if_option_with_same_long_name_as_other_command_option(
-    builder
+    builder,
 ):
     builder.add_option(CommandOption("option", "a"))
 
@@ -140,7 +140,7 @@ def test_add_command_fails_if_option_with_same_long_name_as_other_option(builder
 
 
 def test_add_command_fails_if_option_with_same_long_name_as_option_in_base_format(
-    base_format_builder
+    base_format_builder,
 ):
     base_format_builder.add_option(Option("option", "a"))
 
@@ -151,7 +151,7 @@ def test_add_command_fails_if_option_with_same_long_name_as_option_in_base_forma
 
 
 def test_add_command_fails_if_option_with_same_short_name_as_other_command_option(
-    builder
+    builder,
 ):
     builder.add_option(CommandOption("option", "a"))
 
@@ -167,7 +167,7 @@ def test_add_command_fails_if_option_with_same_short_name_as_other_option(builde
 
 
 def test_add_command_fails_if_option_with_same_short_name_as_alias_of_other_option(
-    builder
+    builder,
 ):
     builder.add_option(CommandOption("option1", "a"))
 
@@ -176,7 +176,7 @@ def test_add_command_fails_if_option_with_same_short_name_as_alias_of_other_opti
 
 
 def test_add_command_fails_if_option_with_same_short_name_as_option_in_base_format(
-    base_format_builder
+    base_format_builder,
 ):
     base_format_builder.add_option(Option("option", "a"))
 
@@ -220,7 +220,7 @@ def test_fail_if_adding_required_argument_after_optional_argument(builder):
 
 
 def test_fail_if_adding_required_argument_after_optional_argument_in_base_definition(
-    base_format_builder
+    base_format_builder,
 ):
     base_format_builder.add_argument(Argument("argument1"))
 
@@ -238,7 +238,7 @@ def test_fail_if_adding_required_argument_after_multi_valued_argument(builder):
 
 
 def test_fail_if_adding_required_argument_after_multi_valued_argument_in_base_definition(
-    base_format_builder
+    base_format_builder,
 ):
     base_format_builder.add_argument(Argument("argument1", Argument.MULTI_VALUED))
 
@@ -256,7 +256,7 @@ def test_fail_if_adding_optional_argument_after_multi_valued_argument(builder):
 
 
 def test_fail_if_adding_optional_argument_after_multi_valued_argument_in_base_definition(
-    base_format_builder
+    base_format_builder,
 ):
     base_format_builder.add_argument(Argument("argument1", Argument.MULTI_VALUED))
 
@@ -274,7 +274,7 @@ def test_fail_if_adding_argument_with_existing_name(builder):
 
 
 def test_fail_if_adding_argument_with_existing_name_in_base_definition(
-    base_format_builder
+    base_format_builder,
 ):
     base_format_builder.add_argument(Argument("argument", Argument.REQUIRED))
 
@@ -359,7 +359,7 @@ def test_get_argument_by_position_fails_if_unknown_position(builder):
 
 
 def test_get_argument_fails_if_in_base_definition_but_include_base_disabled(
-    base_format_builder
+    base_format_builder,
 ):
     arg = Argument("argument")
     base_format_builder.add_argument(arg)
@@ -579,7 +579,7 @@ def test_add_option_fails_if_same_long_name_in_base_format(base_format_builder):
 
 
 def test_add_option_fails_if_same_long_name_as_command_option_in_base_format(
-    base_format_builder
+    base_format_builder,
 ):
     base_format_builder.add_option(Option("option", "a"))
 
@@ -590,7 +590,7 @@ def test_add_option_fails_if_same_long_name_as_command_option_in_base_format(
 
 
 def test_add_option_fails_if_same_long_name_as_command_option_alias_in_base_format(
-    base_format_builder
+    base_format_builder,
 ):
     base_format_builder.add_command_option(CommandOption("option", "a", ["alias"]))
 
@@ -710,7 +710,7 @@ def test_get_option_fails_with_unknown_name(builder):
 
 
 def test_get_option_fails_if_in_base_format_but_include_base_disabled(
-    base_format_builder
+    base_format_builder,
 ):
     base_format_builder.add_option(Option("option"))
 
