@@ -12,7 +12,7 @@ class DefaultStyleSet(StyleSet):
             Style("info").fg("green"),
             Style("comment").fg("cyan"),
             Style("question").fg("blue"),
-            Style("error").fg("red"),
+            Style("error").fg("red").bold(),
             Style("b").bold(),
             Style("u").underlined(),
             Style("c1").fg("cyan"),

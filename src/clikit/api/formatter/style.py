@@ -6,14 +6,14 @@ class Style(object):
     A formatter style.
     """
 
-    _colors = {"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"}
-
     def __init__(self, tag=None):  # type: (Optional[str]) -> None
         self._tag = tag
         self._fg_color = None
         self._bg_color = None
         self._bold = False
         self._underlined = False
+        self._italic = False
+        self._dark = False
         self._blinking = False
         self._inverse = False
         self._hidden = False
@@ -62,6 +62,22 @@ class Style(object):
 
         return self
 
+    def italic(self, italic=True):  # type: (bool) -> Style
+        """
+        Enables or disables italic
+        """
+        self._italic = italic
+
+        return self
+
+    def dark(self, dark=True):  # type: (bool) -> Style
+        """
+        Enables or disables dark
+        """
+        self._dark = dark
+
+        return self
+
     def blinking(self, blinking=True):  # type: (bool) -> Style
         """
         Enables or disables blinking.
@@ -91,6 +107,12 @@ class Style(object):
 
     def is_underlined(self):  # type: () -> bool
         return self._underlined
+
+    def is_italic(self):  # type: () -> bool
+        return self._italic
+
+    def is_dark(self):  # type: () -> bool
+        return self._dark
 
     def is_blinking(self):  # type: () -> bool
         return self._blinking

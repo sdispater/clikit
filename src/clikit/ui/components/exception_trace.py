@@ -3,11 +3,8 @@ import inspect
 import io
 import keyword
 import sys
-import token
 import tokenize
 import traceback
-
-from woops.inspector import Inspector
 
 from clikit.api.io import IO
 from clikit.utils._compat import PY2
@@ -20,18 +17,29 @@ class Highlighter(object):
     TOKEN_DEFAULT = "token_default"
     TOKEN_COMMENT = "token_comment"
     TOKEN_STRING = "token_string"
+    TOKEN_NUMBER = "token_number"
     TOKEN_KEYWORD = "token_keyword"
+    TOKEN_BUILTIN = "token_builtin"
+    TOKEN_OP = "token_op"
     LINE_MARKER = "line_marker"
     LINE_NUMBER = "line_number"
 
     DEFAULT_THEME = {
-        TOKEN_STRING: "fg=red",
-        TOKEN_COMMENT: "fg=yellow",
-        TOKEN_KEYWORD: "fg=green",
-        TOKEN_DEFAULT: "fg=white",
-        LINE_MARKER: "fg=red",
-        LINE_NUMBER: "fg=black;options=bold",
+        TOKEN_STRING: "fg=light_yellow",
+        TOKEN_NUMBER: "fg=green",
+        TOKEN_COMMENT: "fg=default;options=dark,italic",
+        TOKEN_KEYWORD: "fg=light_blue",
+        TOKEN_BUILTIN: "fg=light_magenta",
+        TOKEN_DEFAULT: "fg=default",
+        TOKEN_OP: "fg=default;options=dark",
+        LINE_MARKER: "fg=red;options=bold",
+        LINE_NUMBER: "fg=default;options=dark",
     }
+
+    KEYWORDS = set(keyword.kwlist)
+    BUILTINS = set(
+        __builtins__.keys() if type(__builtins__) is dict else dir(__builtins__)
+    )
 
     def __init__(self):
         self._theme = self.DEFAULT_THEME.copy()
@@ -54,50 +62,72 @@ class Highlighter(object):
 
     def split_to_lines(self, source):
         lines = []
+        current_line = 1
+        current_col = 0
+        buffer = ""
+        current_type = None
+        tokens = tokenize.tokenize(io.BytesIO(encode(source)).readline)
+        line = ""
+        current_token_info = None
+        for token_info in tokens:
+            token_type, token_string, start, end, _ = token_info
+            lineno = start[0]
+            if lineno == 0:
+                # Encoding line
+                continue
 
-        for i, raw_line in enumerate(source.split("\n")):
-            output = []
-            tokens = tokenize.tokenize(io.BytesIO(encode(raw_line)).readline)
-            current_token = None
-            current_col = 1
-            line = ""
-            buffer = ""
-            current_type = None
-            for token_info in tokens:
-                token_type, token_string, start, end, _ = token_info
-                lineno = start[0]
-                if lineno == 0:
-                    # Encoding line
-                    continue
+            if token_type == tokenize.ENDMARKER:
+                # End of source
+                lines.append(line)
+                break
 
-                if token_type == token.ENDMARKER:
-                    continue
+            if lineno > current_line:
+                diff = lineno - current_line
+                if diff > 1:
+                    lines += [""] * (diff - 1)
 
-                if start[1] > current_col:
-                    buffer += raw_line[current_col : start[1]]
+                line += "<{}>{}</>".format(
+                    self._theme[current_type], buffer.rstrip("\n")
+                )
 
-                if token_string in keyword.kwlist:
-                    new_type = self.TOKEN_KEYWORD
-                elif token_type == token.STRING:
-                    new_type = self.TOKEN_STRING
-                else:
-                    new_type = self.TOKEN_DEFAULT
+                # New line
+                lines.append(line)
+                line = ""
+                current_line = lineno
+                current_col = 0
+                buffer = ""
 
-                if current_type is None:
-                    current_type = new_type
+            if start[1] > current_col:
+                buffer += token_info.line[current_col : start[1]]
 
-                if current_type != new_type:
-                    line += "<{}>{}</>".format(self._theme[current_type], buffer)
-                    buffer = ""
-                    current_type = new_type
+            if token_string in self.KEYWORDS:
+                new_type = self.TOKEN_KEYWORD
+            elif token_string in self.BUILTINS:
+                new_type = self.TOKEN_BUILTIN
+            elif token_type == tokenize.STRING:
+                new_type = self.TOKEN_STRING
+            elif token_type == tokenize.NUMBER:
+                new_type = self.TOKEN_NUMBER
+            elif token_type == tokenize.COMMENT:
+                new_type = self.TOKEN_COMMENT
+            elif token_type == tokenize.OP:
+                new_type = self.TOKEN_OP
+            elif token_type == tokenize.NEWLINE:
+                continue
+            else:
+                new_type = self.TOKEN_DEFAULT
 
-                buffer += token_string
-                current_col = end[1]
+            if current_type is None:
+                current_type = new_type
 
-            if current_type is not None:
+            if current_type != new_type:
                 line += "<{}>{}</>".format(self._theme[current_type], buffer)
+                buffer = ""
+                current_type = new_type
 
-            lines.append(line)
+            buffer += token_string
+            current_col = end[1]
+            current_token_info = token_info
 
         return lines
 
@@ -149,84 +179,110 @@ class ExceptionTrace(object):
         ],
     }
 
+    _FRAME_SNIPPET_CACHE = {}
+
     def __init__(self, exception):  # type: (Exception) -> None
         self._exception = exception
         self._exc_info = sys.exc_info()
         self._higlighter = Highlighter()
 
     def render(self, io, simple=False):  # type: (IO, bool) -> None
+        if simple:
+            io.write_line("<error>{}</error>".format(str(self._exception)))
+            return
+
+        if not PY36:
+            return self._render_legacy(io)
+
+        return self._render_exception(io, self._exception)
+
+    def _render_legacy(self, io):
         if hasattr(self._exception, "__traceback__"):
             tb = self._exception.__traceback__
         else:
             tb = self._exc_info[2]
 
-        if not simple:
-            title = "\n<error>{}</error>\n\n<b>{}</b>".format(
-                self._exception.__class__.__name__, str(self._exception)
-            )
-        else:
-            title = "<error>{}</error>".format(str(self._exception))
+        title = "\n<error>{}</error>\n\n<b>{}</b>".format(
+            self._exception.__class__.__name__, str(self._exception)
+        )
 
         io.write_line(title)
-
-        if simple:
-            return
-
-        if PY36:
-            io.write_line("")
-            return self._render_pretty_error(io)
 
         if io.is_verbose():
             io.write_line("")
             self._render_traceback(io, tb)
 
-    def _render_pretty_error(self, io):
-        inspector = Inspector(self._exception)
+    def _render_exception(self, io, exception):
+        from woops.inspector import Inspector
 
+        inspector = Inspector(exception)
         if not inspector.frames:
             return
 
-        frame = inspector.frames[-1]
+        title = "\n<error>{}</error>\n\n<b>{}</b>\n".format(
+            inspector.exception_name, inspector.exception_message
+        )
+
+        io.write_line(title)
+
+        current_frame = inspector.frames[-1]
         code_lines = self._higlighter.code_snippet(
-            frame.file_content, frame.lineno, 4, 4
+            current_frame.file_content, current_frame.lineno, 4, 4
         )
 
         io.write_line(
-            "at <c1>{}</c1> line <b>{}</b>".format(frame.filename, frame.lineno)
+            "at <fg=light_cyan>{}</>:<b>{}</b> in <fg=light_green>{}</>".format(
+                current_frame.filename, current_frame.lineno, current_frame.function
+            )
         )
-        io.write_line("")
         for code_line in code_lines:
             io.write_line(code_line)
 
-        if io.is_verbose():
-
-            max_frame_length = len(str(len(inspector.frames[:-1])))
-            for i, frame in enumerate(reversed(inspector.frames[:-1])):
-                io.write_line("")
-                io.write_line(
-                    "<c1>{:>{}}</c1> in <c2>{}</c2> at <c1>{}</c1> line <b>{}</b>".format(
-                        i + 1,
-                        max_frame_length,
-                        frame.function,
-                        frame.filename,
-                        frame.lineno,
-                    )
-                )
-                if not io.is_debug():
+        remaining_frames_length = len(inspector.frames) - 1
+        if io.is_verbose() and remaining_frames_length:
+            io.write_line("")
+            io.write_line("<fg=yellow;options=bold>Stack trace</>:")
+            max_frame_length = len(str(remaining_frames_length))
+            frame_collections = inspector.frames.compact()
+            i = 0
+            for collection in reversed(frame_collections):
+                if collection.is_repeated() > 0:
+                    io.write_line("")
                     io.write_line(
-                        "{} {}".format(
-                            " " * max_frame_length,
-                            self._higlighter.split_to_lines(frame.line.lstrip())[0],
+                        "... Previous <b>{}</b> frame{} repeated <fg=light_magenta>{}</> times".format(
+                            len(collection),
+                            "s" if len(collection) > 1 else "",
+                            collection.repetitions,
                         )
                     )
-                else:
-                    code_lines = self._higlighter.code_snippet(
-                        frame.file_content, frame.lineno,
+
+                    i += len(collection) * collection.repetitions
+
+                for frame in reversed(collection):
+                    io.write_line("")
+                    io.write_line(
+                        "<fg=light_magenta>{:>{}}</> at <fg=light_cyan>{}</>:<b>{}</b> in <fg=light_green>{}</>".format(
+                            i + 1,
+                            max_frame_length,
+                            frame.filename,
+                            frame.lineno,
+                            frame.function,
+                        )
                     )
 
-                    io.write_line("")
+                    if (frame, 2, 2) not in self._FRAME_SNIPPET_CACHE:
+                        code_lines = self._higlighter.code_snippet(
+                            frame.file_content, frame.lineno,
+                        )
+
+                        self._FRAME_SNIPPET_CACHE[(frame, 2, 2)] = code_lines
+
+                    code_lines = self._FRAME_SNIPPET_CACHE[(frame, 2, 2)]
+
                     for code_line in code_lines:
                         io.write_line(code_line)
+
+                    i += 1
 
     def _render_traceback(self, io, tb):  # type: (IO, ...) -> None
         frames = []
