@@ -1,4 +1,4 @@
-class CliKitException(object):
+class CliKitException(Exception):
     """
     Base class for CliKit exceptions
     """
