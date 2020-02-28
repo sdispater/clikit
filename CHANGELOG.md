@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.4.2] - 2020-02-28
+
+### Fixed
+
+- Fixed the terminal width being set to 0 in some circumstances ([#15](https://github.com/sdispater/clikit/pull/15)).
+- Fixed the comptibility with the latest version of [pastel](https://github.com/sdispater/pastel) ([#10](https://github.com/sdispater/clikit/pull/10)).
+
+
 ## [0.4.1] - 2019-12-06
 
 ### Fixed
