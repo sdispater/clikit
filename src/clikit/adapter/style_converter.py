@@ -16,7 +16,7 @@ class StyleConverter(object):
             options.append("bold")
 
         if style.is_underlined():
-            options.append("underscore")
+            options.append("underline")
 
         if style.is_blinking():
             options.append("blink")
