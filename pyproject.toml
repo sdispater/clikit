@@ -32,6 +32,7 @@ pytest = "^4.0"
 pytest-cov = "^2.6"
 tox = "^3.5"
 pre-commit = "^1.12"
+pytest-mock = "^2.0.0"
 
 [build-system]
 requires = ["poetry>=1.0.0b2"]

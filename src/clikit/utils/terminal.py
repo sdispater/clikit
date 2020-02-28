@@ -54,6 +54,10 @@ class Terminal(object):
         if dimensions is None:
             dimensions = 80, 25
 
+        # Ensure we have a valid width
+        if dimensions[0] <= 0:
+            dimensions = 80, dimensions[1]
+
         self._width, self._height = dimensions
 
     def _get_terminal_size_windows(self):
