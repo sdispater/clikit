@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import os
 import subprocess
 
@@ -70,3 +73,11 @@ def test_no_interaction(io):
 
     question = Question("Do you have a job?", "not yet")
     assert "not yet" == question.ask(io)
+
+
+def test_ask_question_with_special_characters(io):
+    question = Question("What time is it, Sébastien?", "2PMë")
+    io.set_input("\n")
+
+    assert "2PMë" == question.ask(io)
+    assert "What time is it, Sébastien? " == io.fetch_error()
