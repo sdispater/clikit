@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.4.3] - 2020-03-20
+
+### Fixed
+
+- Fixed encoding errors in questions for Python 2.7.
+
+
 ## [0.4.2] - 2020-02-28
 
 ### Fixed
