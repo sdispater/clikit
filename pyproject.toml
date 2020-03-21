@@ -35,5 +35,5 @@ pre-commit = "^1.12"
 pytest-mock = "^2.0.0"
 
 [build-system]
-requires = ["poetry>=1.0.0b2"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry_core>=1.0.0a4"]
+build-backend = "poetry_core.masonry.api"
