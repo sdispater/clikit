@@ -63,7 +63,7 @@ def test_render_better_error_message():
        46| 
        47|     trace.render(io)
 """.format(
-        __file__
+        trace._get_relative_file_path(__file__)
     )
     assert expected == io.fetch_output()
 
@@ -139,7 +139,8 @@ def test_render_debug_better_error_message():
       112\|     except Exception as e:  # Exception
       113\|         trace = ExceptionTrace\(e\)
 """.format(
-        re.escape(__file__), re.escape(__file__)
+        re.escape(trace._get_relative_file_path(__file__)),
+        re.escape(trace._get_relative_file_path(__file__)),
     )
 
     assert re.match(expected, io.fetch_output()) is not None
@@ -168,36 +169,38 @@ def test_render_debug_better_error_message_recursion_error():
 
   maximum recursion depth exceeded
 
-  at {}:149 in recursion_error
-      145\|     assert re.match\(expected, io.fetch_output\(\)\) is not None
-      146\| 
+  at {}:150 in recursion_error
+      146\|     assert re.match\(expected, io.fetch_output\(\)\) is not None
       147\| 
-      148\| def recursion_error\(\):
-    > 149\|     recursion_error\(\)
-      150\| 
+      148\| 
+      149\| def recursion_error\(\):
+    > 150\|     recursion_error\(\)
       151\| 
-      152\| @pytest.mark.skipif\(
-      153\|     not PY36, reason="Better error messages are only available for Python \^3\.6"
+      152\| 
+      153\| @pytest.mark.skipif\(
+      154\|     not PY36, reason="Better error messages are only available for Python \^3\.6"
 
   Stack trace:
 
   ...  Previous 1 frame repeated \d+ times
 
-  \d+  {}:149 in recursion_error
-        147\| 
-        148\| def recursion_error\(\):
-      > 149\|     recursion_error\(\)
-        150\| 
+  \d+  {}:150 in recursion_error
+        148\| 
+        149\| def recursion_error\(\):
+      > 150\|     recursion_error\(\)
         151\| 
+        152\| 
 
-  \d+  {}:160 in test_render_debug_better_error_message_recursion_error
-        158\| 
-        159\|     try:
-      > 160\|         recursion_error\(\)
-        161\|     except RecursionError as e:
-        162\|         trace = ExceptionTrace\(e\)
+  \d+  {}:161 in test_render_debug_better_error_message_recursion_error
+        159\| 
+        160\|     try:
+      > 161\|         recursion_error\(\)
+        162\|     except RecursionError as e:
+        163\|         trace = ExceptionTrace\(e\)
 """.format(
-        re.escape(__file__), re.escape(__file__), re.escape(__file__)
+        re.escape(trace._get_relative_file_path(__file__)),
+        re.escape(trace._get_relative_file_path(__file__)),
+        re.escape(trace._get_relative_file_path(__file__)),
     )
 
     assert re.match(expected, io.fetch_output()) is not None
@@ -235,10 +238,11 @@ def test_render_verbose_better_error_message():
 
   Stack trace:
 
-  1  {}:214 in test_render_verbose_better_error_message
+  1  {}:217 in test_render_verbose_better_error_message
      fail\(\)
 """.format(
-        re.escape(__file__), re.escape(__file__)
+        re.escape(trace._get_relative_file_path(__file__)),
+        re.escape(trace._get_relative_file_path(__file__)),
     )
 
     assert re.match(expected, io.fetch_output()) is not None

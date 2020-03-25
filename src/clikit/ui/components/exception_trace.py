@@ -2,6 +2,7 @@ import ast
 import inspect
 import io
 import keyword
+import os
 import sys
 import tokenize
 import traceback
@@ -232,7 +233,9 @@ class ExceptionTrace(object):
 
         io.write_line(
             "  at <fg=green>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
-                current_frame.filename, current_frame.lineno, current_frame.function
+                self._get_relative_file_path(current_frame.filename),
+                current_frame.lineno,
+                current_frame.function,
             )
         )
         for code_line in code_lines:
@@ -266,7 +269,7 @@ class ExceptionTrace(object):
                         "  <fg=yellow>{:>{}}</>  <fg=default;options=bold>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
                             i + 1,
                             max_frame_length,
-                            frame.filename,
+                            self._get_relative_file_path(frame.filename),
                             frame.lineno,
                             frame.function,
                         )
@@ -294,6 +297,18 @@ class ExceptionTrace(object):
                         )
 
                     i += 1
+
+    def _get_relative_file_path(self, filepath):
+        cwd = os.getcwd()
+
+        if cwd:
+            filepath = filepath.replace(cwd + os.path.sep, "")
+
+        home = os.path.expanduser("~")
+        if home:
+            filepath = filepath.replace(home + os.path.sep, "~" + os.path.sep)
+
+        return filepath
 
     def _render_traceback(self, io, tb):  # type: (IO, ...) -> None
         frames = []
