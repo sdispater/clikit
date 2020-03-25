@@ -25,11 +25,11 @@ class Highlighter(object):
     LINE_NUMBER = "line_number"
 
     DEFAULT_THEME = {
-        TOKEN_STRING: "fg=light_yellow",
-        TOKEN_NUMBER: "fg=green",
+        TOKEN_STRING: "fg=yellow;options=bold",
+        TOKEN_NUMBER: "fg=blue;options=bold",
         TOKEN_COMMENT: "fg=default;options=dark,italic",
-        TOKEN_KEYWORD: "fg=light_blue",
-        TOKEN_BUILTIN: "fg=light_magenta",
+        TOKEN_KEYWORD: "fg=magenta;options=bold",
+        TOKEN_BUILTIN: "fg=default;options=bold",
         TOKEN_DEFAULT: "fg=default",
         TOKEN_OP: "fg=default;options=dark",
         LINE_MARKER: "fg=red;options=bold",
@@ -219,11 +219,11 @@ class ExceptionTrace(object):
         if not inspector.frames:
             return
 
-        title = "\n<error>{}</error>\n\n<b>{}</b>\n".format(
-            inspector.exception_name, inspector.exception_message
-        )
-
-        io.write_line(title)
+        io.write_line("")
+        io.write_line("  <error>{}</error>".format(inspector.exception_name))
+        io.write_line("")
+        io.write_line("  <b>{}</b>".format(inspector.exception_message))
+        io.write_line("")
 
         current_frame = inspector.frames[-1]
         code_lines = self._higlighter.code_snippet(
@@ -231,17 +231,17 @@ class ExceptionTrace(object):
         )
 
         io.write_line(
-            "at <fg=light_cyan>{}</>:<b>{}</b> in <fg=light_green>{}</>".format(
+            "  at <fg=green>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
                 current_frame.filename, current_frame.lineno, current_frame.function
             )
         )
         for code_line in code_lines:
-            io.write_line(code_line)
+            io.write_line("  " + code_line)
 
         remaining_frames_length = len(inspector.frames) - 1
         if io.is_verbose() and remaining_frames_length:
             io.write_line("")
-            io.write_line("<fg=yellow;options=bold>Stack trace</>:")
+            io.write_line("  <fg=yellow>Stack trace</>:")
             max_frame_length = len(str(remaining_frames_length))
             frame_collections = inspector.frames.compact()
             i = 0
@@ -249,7 +249,9 @@ class ExceptionTrace(object):
                 if collection.is_repeated() > 0:
                     io.write_line("")
                     io.write_line(
-                        "... Previous <b>{}</b> frame{} repeated <fg=light_magenta>{}</> times".format(
+                        "  <fg=blue>{:>{}}</>  Previous <fg=yellow>{}</> frame{} repeated <fg=blue>{}</> times".format(
+                            "...",
+                            max_frame_length,
                             len(collection),
                             "s" if len(collection) > 1 else "",
                             collection.repetitions,
@@ -261,7 +263,7 @@ class ExceptionTrace(object):
                 for frame in reversed(collection):
                     io.write_line("")
                     io.write_line(
-                        "<fg=light_magenta>{:>{}}</> at <fg=light_cyan>{}</>:<b>{}</b> in <fg=light_green>{}</>".format(
+                        "  <fg=yellow>{:>{}}</>  <fg=default;options=bold>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
                             i + 1,
                             max_frame_length,
                             frame.filename,
@@ -270,17 +272,26 @@ class ExceptionTrace(object):
                         )
                     )
 
-                    if (frame, 2, 2) not in self._FRAME_SNIPPET_CACHE:
-                        code_lines = self._higlighter.code_snippet(
-                            frame.file_content, frame.lineno,
+                    if io.is_debug():
+                        if (frame, 2, 2) not in self._FRAME_SNIPPET_CACHE:
+                            code_lines = self._higlighter.code_snippet(
+                                frame.file_content, frame.lineno,
+                            )
+
+                            self._FRAME_SNIPPET_CACHE[(frame, 2, 2)] = code_lines
+
+                        code_lines = self._FRAME_SNIPPET_CACHE[(frame, 2, 2)]
+
+                        for code_line in code_lines:
+                            io.write_line(
+                                " {:>{}}{}".format(" ", max_frame_length, code_line)
+                            )
+                    else:
+                        io.write_line(
+                            "  {:>{}}  {}".format(
+                                " ", max_frame_length, frame.line.strip()
+                            )
                         )
-
-                        self._FRAME_SNIPPET_CACHE[(frame, 2, 2)] = code_lines
-
-                    code_lines = self._FRAME_SNIPPET_CACHE[(frame, 2, 2)]
-
-                    for code_line in code_lines:
-                        io.write_line(code_line)
 
                     i += 1
 
