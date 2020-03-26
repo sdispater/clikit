@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.5.0] - 2020-03-26
+
+### Added
+
+- Errors are now rendered in a nicer way for Python 3.6+ ([#19](https://github.com/sdispater/clikit/pull/19)).
+
+
 ## [0.4.3] - 2020-03-20
 
 ### Fixed
@@ -108,7 +115,10 @@
 - Fixed the progress indicator component.
 
 
-[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.4.1...master
+[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.5.0...master
+[0.5.0]: https://github.com/sdispater/tomlkit/releases/tag/0.5.0
+[0.4.3]: https://github.com/sdispater/tomlkit/releases/tag/0.4.3
+[0.4.2]: https://github.com/sdispater/tomlkit/releases/tag/0.4.2
 [0.4.1]: https://github.com/sdispater/tomlkit/releases/tag/0.4.1
 [0.4.0]: https://github.com/sdispater/tomlkit/releases/tag/0.4.0
 [0.3.2]: https://github.com/sdispater/tomlkit/releases/tag/0.3.2
