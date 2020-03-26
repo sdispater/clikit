@@ -182,7 +182,7 @@ def test_render_debug_better_error_message_recursion_error():
 
   Stack trace:
 
-  ...  Previous 1 frame repeated \d+ times
+  ...  Previous frame repeated \d+ times
 
   \d+  {}:150 in recursion_error
         148\| 
@@ -245,4 +245,62 @@ def test_render_verbose_better_error_message():
         re.escape(trace._get_relative_file_path(__file__)),
     )
 
+    assert re.match(expected, io.fetch_output()) is not None
+
+
+def first():
+    def second():
+        first()
+
+    second()
+
+
+@pytest.mark.skipif(
+    not PY36, reason="Better error messages are only available for Python ^3.6"
+)
+def test_render_debug_better_error_message_recursion_error_with_multiple_duplicated_frames():
+    io = BufferedIO()
+    io.set_verbosity(VERBOSE)
+
+    with pytest.raises(RecursionError) as e:
+        first()
+
+    trace = ExceptionTrace(e.value)
+
+    trace.render(io)
+
+    expected = r"""^
+  RecursionError
+
+  maximum recursion depth exceeded
+
+  at {filename}:255 in first
+      251\| def first\(\):
+      252\|     def second\(\):
+      253\|         first\(\)
+      254\| 
+    > 255\|     second\(\)
+      256\| 
+      257\| 
+      258\| @pytest.mark.skipif\(
+      259\|     not PY36, reason="Better error messages are only available for Python \^3\.6"
+
+  Stack trace:
+
+  ...  Previous 2 frames repeated \d+ times
+
+  \d+  {filename}:253 in second
+       first\(\)
+
+  \d+  {filename}:255 in first
+       second\(\)
+
+  \d+  {filename}:266 in test_render_debug_better_error_message_recursion_error_with_multiple_duplicated_frames
+       first\(\)
+""".format(
+        filename=re.escape(trace._get_relative_file_path(__file__)),
+    )
+
+    print(expected)
+    print(io.fetch_output())
     assert re.match(expected, io.fetch_output()) is not None

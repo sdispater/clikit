@@ -249,14 +249,20 @@ class ExceptionTrace(object):
             frame_collections = inspector.frames.compact()
             i = 0
             for collection in reversed(frame_collections):
-                if collection.is_repeated() > 0:
+                if collection.is_repeated():
                     io.write_line("")
+                    if len(collection) > 1:
+                        frames_message = "<fg=yellow>{}</> frames".format(
+                            len(collection)
+                        )
+                    else:
+                        frames_message = "frame"
+
                     io.write_line(
-                        "  <fg=blue>{:>{}}</>  Previous <fg=yellow>{}</> frame{} repeated <fg=blue>{}</> times".format(
+                        "  <fg=blue>{:>{}}</>  Previous {} repeated <fg=blue>{}</> times".format(
                             "...",
                             max_frame_length,
-                            len(collection),
-                            "s" if len(collection) > 1 else "",
+                            frames_message,
                             collection.repetitions,
                         )
                     )
