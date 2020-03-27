@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.5.1] - 2020-03-27
+
+### Fixed
+
+- Improved the error message display for multiline messages ([#21](https://github.com/sdispater/clikit/pull/21)).
+
+
 ## [0.5.0] - 2020-03-26
 
 ### Added
@@ -115,7 +122,8 @@
 - Fixed the progress indicator component.
 
 
-[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.5.0...master
+[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.5.1...master
+[0.5.1]: https://github.com/sdispater/tomlkit/releases/tag/0.5.1
 [0.5.0]: https://github.com/sdispater/tomlkit/releases/tag/0.5.0
 [0.4.3]: https://github.com/sdispater/tomlkit/releases/tag/0.4.3
 [0.4.2]: https://github.com/sdispater/tomlkit/releases/tag/0.4.2
