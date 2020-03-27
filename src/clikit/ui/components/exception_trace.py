@@ -220,37 +220,38 @@ class ExceptionTrace(object):
         if not inspector.frames:
             return
 
+        self._render_line(
+            io, "<error>{}</error>".format(inspector.exception_name), True
+        )
         io.write_line("")
-        io.write_line("  <error>{}</error>".format(inspector.exception_name))
-        io.write_line("")
-        io.write_line("  <b>{}</b>".format(inspector.exception_message))
-        io.write_line("")
+        for fragment in inspector.exception_message.split("\n"):
+            self._render_line(io, "<b>{}</b>".format(fragment))
 
         current_frame = inspector.frames[-1]
         code_lines = self._higlighter.code_snippet(
             current_frame.file_content, current_frame.lineno, 4, 4
         )
 
-        io.write_line(
-            "  at <fg=green>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
+        self._render_line(
+            io,
+            "at <fg=green>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
                 self._get_relative_file_path(current_frame.filename),
                 current_frame.lineno,
                 current_frame.function,
-            )
+            ),
+            True,
         )
         for code_line in code_lines:
-            io.write_line("  " + code_line)
+            self._render_line(io, code_line)
 
         remaining_frames_length = len(inspector.frames) - 1
         if io.is_verbose() and remaining_frames_length:
-            io.write_line("")
-            io.write_line("  <fg=yellow>Stack trace</>:")
+            self._render_line(io, "<fg=yellow>Stack trace</>:", True)
             max_frame_length = len(str(remaining_frames_length))
             frame_collections = inspector.frames.compact()
             i = 0
             for collection in reversed(frame_collections):
                 if collection.is_repeated():
-                    io.write_line("")
                     if len(collection) > 1:
                         frames_message = "<fg=yellow>{}</> frames".format(
                             len(collection)
@@ -258,27 +259,30 @@ class ExceptionTrace(object):
                     else:
                         frames_message = "frame"
 
-                    io.write_line(
-                        "  <fg=blue>{:>{}}</>  Previous {} repeated <fg=blue>{}</> times".format(
+                    self._render_line(
+                        io,
+                        "<fg=blue>{:>{}}</>  Previous {} repeated <fg=blue>{}</> times".format(
                             "...",
                             max_frame_length,
                             frames_message,
                             collection.repetitions,
-                        )
+                        ),
+                        True,
                     )
 
                     i += len(collection) * collection.repetitions
 
                 for frame in reversed(collection):
-                    io.write_line("")
-                    io.write_line(
-                        "  <fg=yellow>{:>{}}</>  <fg=default;options=bold>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
+                    self._render_line(
+                        io,
+                        "<fg=yellow>{:>{}}</>  <fg=default;options=bold>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
                             i + 1,
                             max_frame_length,
                             self._get_relative_file_path(frame.filename),
                             frame.lineno,
                             frame.function,
-                        )
+                        ),
+                        True,
                     )
 
                     if io.is_debug():
@@ -292,17 +296,28 @@ class ExceptionTrace(object):
                         code_lines = self._FRAME_SNIPPET_CACHE[(frame, 2, 2)]
 
                         for code_line in code_lines:
-                            io.write_line(
-                                " {:>{}}{}".format(" ", max_frame_length, code_line)
+                            self._render_line(
+                                io,
+                                "{:>{}}{}".format(" ", max_frame_length, code_line),
+                                indent=1,
                             )
                     else:
-                        io.write_line(
-                            "  {:>{}}  {}".format(
+                        self._render_line(
+                            io,
+                            "{:>{}}  {}".format(
                                 " ", max_frame_length, frame.line.strip()
-                            )
+                            ),
                         )
 
                     i += 1
+
+    def _render_line(
+        self, io, line, new_line=False, indent=2
+    ):  # type: (IO, str) -> None
+        if new_line:
+            io.write_line("")
+
+        io.write_line("{}{}".format(indent * " ", line))
 
     def _get_relative_file_path(self, filepath):
         cwd = os.getcwd()
