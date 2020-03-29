@@ -3,6 +3,7 @@ import inspect
 import io
 import keyword
 import os
+import re
 import sys
 import tokenize
 import traceback
@@ -186,6 +187,12 @@ class ExceptionTrace(object):
         self._exception = exception
         self._exc_info = sys.exc_info()
         self._higlighter = Highlighter()
+        self._ignore = None
+
+    def ignore_files_in(self, ignore):  # type: (str) -> ExceptionTrace
+        self._ignore = ignore
+
+        return self
 
     def render(self, io, simple=False):  # type: (IO, bool) -> None
         if simple:
@@ -273,6 +280,9 @@ class ExceptionTrace(object):
                     i += len(collection) * collection.repetitions
 
                 for frame in reversed(collection):
+                    if self._ignore and re.match(self._ignore, frame.filename):
+                        continue
+
                     self._render_line(
                         io,
                         "<fg=yellow>{:>{}}</>  <fg=default;options=bold>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
