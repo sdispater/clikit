@@ -99,12 +99,9 @@ class Highlighter(object):
                 current_col = 0
                 buffer = ""
 
-            if start[1] > current_col:
-                buffer += token_info.line[current_col : start[1]]
-
             if token_string in self.KEYWORDS:
                 new_type = self.TOKEN_KEYWORD
-            elif token_string in self.BUILTINS:
+            elif token_string in self.BUILTINS or token_string == "self":
                 new_type = self.TOKEN_BUILTIN
             elif token_type == tokenize.STRING:
                 new_type = self.TOKEN_STRING
@@ -122,14 +119,30 @@ class Highlighter(object):
             if current_type is None:
                 current_type = new_type
 
+            if start[1] > current_col:
+                buffer += token_info.line[current_col : start[1]]
+
             if current_type != new_type:
                 line += "<{}>{}</>".format(self._theme[current_type], buffer)
                 buffer = ""
                 current_type = new_type
 
+            if lineno < end[0]:
+                # The token spans multiple lines
+                lines.append(line)
+                token_lines = token_string.split("\n")
+                for l in token_lines[1:-1]:
+                    lines.append("<{}>{}</>".format(self._theme[current_type], l))
+
+                current_line = end[0]
+                buffer = token_lines[-1][: end[1]]
+                line = ""
+                continue
+
             buffer += token_string
             current_col = end[1]
             current_token_info = token_info
+            current_line = lineno
 
         return lines
 
