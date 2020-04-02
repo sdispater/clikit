@@ -243,19 +243,21 @@ class ExceptionTrace(object):
         if not inspector.frames:
             return
 
+        self._render_trace(io, inspector.frames)
+
         self._render_line(
             io, "<error>{}</error>".format(inspector.exception_name), True
         )
         io.write_line("")
-        for fragment in inspector.exception_message.split("\n"):
-            self._render_line(io, "<b>{}</b>".format(fragment))
+        exception_message = io.remove_format(inspector.exception_message).replace(
+            "\n", "\n  "
+        )
+        self._render_line(io, "<b>{}</b>".format(exception_message))
 
         current_frame = inspector.frames[-1]
         self._render_snippet(io, current_frame)
 
         self._render_solution(io, inspector)
-
-        self._render_trace(io, inspector.frames)
 
     def _render_snippet(self, io, frame):
         self._render_line(
@@ -305,8 +307,8 @@ class ExceptionTrace(object):
             self._render_line(io, "<fg=yellow>Stack trace</>:", True)
             max_frame_length = len(str(remaining_frames_length))
             frame_collections = frames.compact()
-            i = 0
-            for collection in reversed(frame_collections):
+            i = remaining_frames_length
+            for collection in frame_collections:
                 if collection.is_repeated():
                     if len(collection) > 1:
                         frames_message = "<fg=yellow>{}</> frames".format(
@@ -326,16 +328,16 @@ class ExceptionTrace(object):
                         True,
                     )
 
-                    i += len(collection) * collection.repetitions
+                    i -= len(collection) * collection.repetitions + len(collection)
 
-                for frame in reversed(collection):
+                for frame in collection:
                     if self._ignore and re.match(self._ignore, frame.filename):
                         continue
 
                     self._render_line(
                         io,
                         "<fg=yellow>{:>{}}</>  <fg=default;options=bold>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
-                            i + 1,
+                            i,
                             max_frame_length,
                             self._get_relative_file_path(frame.filename),
                             frame.lineno,
@@ -368,7 +370,7 @@ class ExceptionTrace(object):
                             ),
                         )
 
-                    i += 1
+                    i -= 1
 
     def _render_line(
         self, io, line, new_line=False, indent=2
