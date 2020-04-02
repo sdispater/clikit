@@ -135,7 +135,10 @@ class ConsoleApplication(BaseApplication):
             if not self._config.is_exception_caught():
                 raise
 
-            trace = ExceptionTrace(e)
+            trace = ExceptionTrace(
+                e,
+                solution_provider_repository=self._config.solution_provider_repository,
+            )
             trace.render(io, simple=isinstance(e, CliKitException))
 
             status_code = self.exception_to_exit_code(e)

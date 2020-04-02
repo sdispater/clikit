@@ -196,8 +196,11 @@ class ExceptionTrace(object):
 
     _FRAME_SNIPPET_CACHE = {}
 
-    def __init__(self, exception):  # type: (Exception) -> None
+    def __init__(
+        self, exception, solution_provider_repository=None
+    ):  # type: (Exception, ...) -> None
         self._exception = exception
+        self._solution_provider_repository = solution_provider_repository
         self._exc_info = sys.exc_info()
         self._higlighter = Highlighter()
         self._ignore = None
@@ -234,7 +237,7 @@ class ExceptionTrace(object):
             self._render_traceback(io, tb)
 
     def _render_exception(self, io, exception):
-        from woops.inspector import Inspector
+        from crashtest.inspector import Inspector
 
         inspector = Inspector(exception)
         if not inspector.frames:
@@ -248,27 +251,60 @@ class ExceptionTrace(object):
             self._render_line(io, "<b>{}</b>".format(fragment))
 
         current_frame = inspector.frames[-1]
-        code_lines = self._higlighter.code_snippet(
-            current_frame.file_content, current_frame.lineno, 4, 4
-        )
+        self._render_snippet(io, current_frame)
 
+        self._render_solution(io, inspector)
+
+        self._render_trace(io, inspector.frames)
+
+    def _render_snippet(self, io, frame):
         self._render_line(
             io,
             "at <fg=green>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
-                self._get_relative_file_path(current_frame.filename),
-                current_frame.lineno,
-                current_frame.function,
+                self._get_relative_file_path(frame.filename),
+                frame.lineno,
+                frame.function,
             ),
             True,
         )
+
+        code_lines = self._higlighter.code_snippet(
+            frame.file_content, frame.lineno, 4, 4
+        )
+
         for code_line in code_lines:
             self._render_line(io, code_line)
 
-        remaining_frames_length = len(inspector.frames) - 1
+    def _render_solution(self, io, inspector):
+        if self._solution_provider_repository is None:
+            return
+
+        solutions = self._solution_provider_repository.get_solutions_for_exception(
+            inspector.exception
+        )
+        for solution in solutions:
+            title = solution.solution_title
+            description = solution.solution_description
+            links = solution.documentation_links
+
+            description = description.replace("\n", "\n    ").strip()
+
+            self._render_line(
+                io,
+                "<fg=blue;options=bold>• </><fg=default;options=bold>{}</>: {} {}".format(
+                    title.rstrip("."),
+                    description,
+                    ", ".join("\n    <fg=blue>{}</>".format(link) for link in links),
+                ),
+                True,
+            )
+
+    def _render_trace(self, io, frames):
+        remaining_frames_length = len(frames) - 1
         if io.is_verbose() and remaining_frames_length:
             self._render_line(io, "<fg=yellow>Stack trace</>:", True)
             max_frame_length = len(str(remaining_frames_length))
-            frame_collections = inspector.frames.compact()
+            frame_collections = frames.compact()
             i = 0
             for collection in reversed(frame_collections):
                 if collection.is_repeated():
