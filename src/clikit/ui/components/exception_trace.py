@@ -302,11 +302,24 @@ class ExceptionTrace(object):
             )
 
     def _render_trace(self, io, frames):
-        remaining_frames_length = len(frames) - 1
+        from crashtest.frame_collection import FrameCollection
+
+        stack_frames = FrameCollection()
+        for frame in frames:
+            if (
+                self._ignore
+                and re.match(self._ignore, frame.filename)
+                and not io.is_debug()
+            ):
+                continue
+
+            stack_frames.append(frame)
+
+        remaining_frames_length = len(stack_frames) - 1
         if io.is_verbose() and remaining_frames_length:
             self._render_line(io, "<fg=yellow>Stack trace</>:", True)
             max_frame_length = len(str(remaining_frames_length))
-            frame_collections = frames.compact()
+            frame_collections = stack_frames.compact()
             i = remaining_frames_length
             for collection in frame_collections:
                 if collection.is_repeated():
@@ -331,9 +344,6 @@ class ExceptionTrace(object):
                     i -= len(collection) * collection.repetitions + len(collection)
 
                 for frame in collection:
-                    if self._ignore and re.match(self._ignore, frame.filename):
-                        continue
-
                     self._render_line(
                         io,
                         "<fg=yellow>{:>{}}</>  <fg=default;options=bold>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
