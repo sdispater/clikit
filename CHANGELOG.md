@@ -1,5 +1,21 @@
 # Change Log
 
+## [0.6.0] - 2020-04-17
+
+### Added
+
+- Support for error solutions ([#24](https://github.com/sdispater/clikit/pull/24)).
+- Ability to ignore files in the stack trace ([#24](https://github.com/sdispater/clikit/pull/24)).
+
+### Changed
+
+- The stack trace will now be displayed above the actual error, so that the error is visible immediately and the read flow of the stack trace is more natural ([#24](https://github.com/sdispater/clikit/pull/24)).
+
+### Fixed
+
+- Fixed the coloring of the code snippets of the stack trace for tokens that span multiple lines ([#24](https://github.com/sdispater/clikit/pull/24)).
+
+
 ## [0.5.1] - 2020-03-27
 
 ### Fixed
@@ -122,7 +138,8 @@
 - Fixed the progress indicator component.
 
 
-[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.5.1...master
+[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.6.0...master
+[0.6.0]: https://github.com/sdispater/tomlkit/releases/tag/0.6.0
 [0.5.1]: https://github.com/sdispater/tomlkit/releases/tag/0.5.1
 [0.5.0]: https://github.com/sdispater/tomlkit/releases/tag/0.5.0
 [0.4.3]: https://github.com/sdispater/tomlkit/releases/tag/0.4.3
