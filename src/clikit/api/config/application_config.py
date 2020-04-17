@@ -15,6 +15,7 @@ from clikit.api.event import EventDispatcher
 from clikit.api.formatter import Style
 from clikit.api.formatter import StyleSet
 from clikit.api.command.exceptions import NoSuchCommandException
+from clikit.utils._compat import PY36
 
 from .command_config import CommandConfig
 from .config import Config
@@ -41,6 +42,15 @@ class ApplicationConfig(Config):
         self._style_set = None
         self._dispatcher = None
         self._pre_resolve_hooks = []  # type: List[Callable]
+
+        if PY36:
+            from crashtest.solution_providers.solution_provider_repository import (
+                SolutionProviderRepository,
+            )
+
+            self._solution_provider_repository = SolutionProviderRepository()
+        else:
+            self._solution_provider_repository = None
 
         super(ApplicationConfig, self).__init__()
 
@@ -257,3 +267,7 @@ class ApplicationConfig(Config):
     @property
     def default_command_resolver(self):
         raise NotImplementedError()
+
+    @property
+    def solution_provider_repository(self):
+        return self._solution_provider_repository

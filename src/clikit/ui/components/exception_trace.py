@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 import ast
 import inspect
 import io
 import keyword
 import os
+import re
 import sys
 import tokenize
 import traceback
@@ -69,7 +71,6 @@ class Highlighter(object):
         current_type = None
         tokens = tokenize.tokenize(io.BytesIO(encode(source)).readline)
         line = ""
-        current_token_info = None
         for token_info in tokens:
             token_type, token_string, start, end, _ = token_info
             lineno = start[0]
@@ -98,12 +99,9 @@ class Highlighter(object):
                 current_col = 0
                 buffer = ""
 
-            if start[1] > current_col:
-                buffer += token_info.line[current_col : start[1]]
-
             if token_string in self.KEYWORDS:
                 new_type = self.TOKEN_KEYWORD
-            elif token_string in self.BUILTINS:
+            elif token_string in self.BUILTINS or token_string == "self":
                 new_type = self.TOKEN_BUILTIN
             elif token_type == tokenize.STRING:
                 new_type = self.TOKEN_STRING
@@ -121,14 +119,30 @@ class Highlighter(object):
             if current_type is None:
                 current_type = new_type
 
+            if start[1] > current_col:
+                buffer += token_info.line[current_col : start[1]]
+
             if current_type != new_type:
                 line += "<{}>{}</>".format(self._theme[current_type], buffer)
                 buffer = ""
                 current_type = new_type
 
+            if lineno < end[0]:
+                # The token spans multiple lines
+                lines.append(line)
+                token_lines = token_string.split("\n")
+                for l in token_lines[1:-1]:
+                    lines.append("<{}>{}</>".format(self._theme[current_type], l))
+
+                current_line = end[0]
+                buffer = token_lines[-1][: end[1]]
+                line = ""
+                continue
+
             buffer += token_string
             current_col = end[1]
             current_token_info = token_info
+            current_line = lineno
 
         return lines
 
@@ -182,10 +196,19 @@ class ExceptionTrace(object):
 
     _FRAME_SNIPPET_CACHE = {}
 
-    def __init__(self, exception):  # type: (Exception) -> None
+    def __init__(
+        self, exception, solution_provider_repository=None
+    ):  # type: (Exception, ...) -> None
         self._exception = exception
+        self._solution_provider_repository = solution_provider_repository
         self._exc_info = sys.exc_info()
         self._higlighter = Highlighter()
+        self._ignore = None
+
+    def ignore_files_in(self, ignore):  # type: (str) -> ExceptionTrace
+        self._ignore = ignore
+
+        return self
 
     def render(self, io, simple=False):  # type: (IO, bool) -> None
         if simple:
@@ -214,43 +237,91 @@ class ExceptionTrace(object):
             self._render_traceback(io, tb)
 
     def _render_exception(self, io, exception):
-        from woops.inspector import Inspector
+        from crashtest.inspector import Inspector
 
         inspector = Inspector(exception)
         if not inspector.frames:
             return
 
+        self._render_trace(io, inspector.frames)
+
         self._render_line(
             io, "<error>{}</error>".format(inspector.exception_name), True
         )
         io.write_line("")
-        for fragment in inspector.exception_message.split("\n"):
-            self._render_line(io, "<b>{}</b>".format(fragment))
+        exception_message = io.remove_format(inspector.exception_message).replace(
+            "\n", "\n  "
+        )
+        self._render_line(io, "<b>{}</b>".format(exception_message))
 
         current_frame = inspector.frames[-1]
-        code_lines = self._higlighter.code_snippet(
-            current_frame.file_content, current_frame.lineno, 4, 4
-        )
+        self._render_snippet(io, current_frame)
 
+        self._render_solution(io, inspector)
+
+    def _render_snippet(self, io, frame):
         self._render_line(
             io,
             "at <fg=green>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
-                self._get_relative_file_path(current_frame.filename),
-                current_frame.lineno,
-                current_frame.function,
+                self._get_relative_file_path(frame.filename),
+                frame.lineno,
+                frame.function,
             ),
             True,
         )
+
+        code_lines = self._higlighter.code_snippet(
+            frame.file_content, frame.lineno, 4, 4
+        )
+
         for code_line in code_lines:
             self._render_line(io, code_line)
 
-        remaining_frames_length = len(inspector.frames) - 1
+    def _render_solution(self, io, inspector):
+        if self._solution_provider_repository is None:
+            return
+
+        solutions = self._solution_provider_repository.get_solutions_for_exception(
+            inspector.exception
+        )
+        for solution in solutions:
+            title = solution.solution_title
+            description = solution.solution_description
+            links = solution.documentation_links
+
+            description = description.replace("\n", "\n    ").strip()
+
+            self._render_line(
+                io,
+                "<fg=blue;options=bold>• </><fg=default;options=bold>{}</>: {}{}".format(
+                    title.rstrip("."),
+                    description,
+                    ",".join("\n    <fg=blue>{}</>".format(link) for link in links),
+                ),
+                True,
+            )
+
+    def _render_trace(self, io, frames):
+        from crashtest.frame_collection import FrameCollection
+
+        stack_frames = FrameCollection()
+        for frame in frames:
+            if (
+                self._ignore
+                and re.match(self._ignore, frame.filename)
+                and not io.is_debug()
+            ):
+                continue
+
+            stack_frames.append(frame)
+
+        remaining_frames_length = len(stack_frames) - 1
         if io.is_verbose() and remaining_frames_length:
             self._render_line(io, "<fg=yellow>Stack trace</>:", True)
             max_frame_length = len(str(remaining_frames_length))
-            frame_collections = inspector.frames.compact()
-            i = 0
-            for collection in reversed(frame_collections):
+            frame_collections = stack_frames.compact()
+            i = remaining_frames_length
+            for collection in frame_collections:
                 if collection.is_repeated():
                     if len(collection) > 1:
                         frames_message = "<fg=yellow>{}</> frames".format(
@@ -270,13 +341,13 @@ class ExceptionTrace(object):
                         True,
                     )
 
-                    i += len(collection) * collection.repetitions
+                    i -= len(collection) * collection.repetitions + len(collection)
 
-                for frame in reversed(collection):
+                for frame in collection:
                     self._render_line(
                         io,
                         "<fg=yellow>{:>{}}</>  <fg=default;options=bold>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
-                            i + 1,
+                            i,
                             max_frame_length,
                             self._get_relative_file_path(frame.filename),
                             frame.lineno,
@@ -309,7 +380,7 @@ class ExceptionTrace(object):
                             ),
                         )
 
-                    i += 1
+                    i -= 1
 
     def _render_line(
         self, io, line, new_line=False, indent=2
