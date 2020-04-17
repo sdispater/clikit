@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import ast
 import inspect
 import io
@@ -70,7 +71,6 @@ class Highlighter(object):
         current_type = None
         tokens = tokenize.tokenize(io.BytesIO(encode(source)).readline)
         line = ""
-        current_token_info = None
         for token_info in tokens:
             token_type, token_string, start, end, _ = token_info
             lineno = start[0]
@@ -293,10 +293,10 @@ class ExceptionTrace(object):
 
             self._render_line(
                 io,
-                "<fg=blue;options=bold>• </><fg=default;options=bold>{}</>: {} {}".format(
+                "<fg=blue;options=bold>• </><fg=default;options=bold>{}</>: {}{}".format(
                     title.rstrip("."),
                     description,
-                    ", ".join("\n    <fg=blue>{}</>".format(link) for link in links),
+                    ",".join("\n    <fg=blue>{}</>".format(link) for link in links),
                 ),
                 True,
             )
