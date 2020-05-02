@@ -53,7 +53,7 @@ class SelectChoiceValidator:
                 try:
                     value = int(value)
 
-                    if value < len(self._values):
+                    if 0 <= value < len(self._values):
                         result = self._values[value]
                     else:
                         result = False

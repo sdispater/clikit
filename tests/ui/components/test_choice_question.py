@@ -4,20 +4,22 @@ from clikit.ui.components import ChoiceQuestion
 
 
 def test_ask_choice(io):
-    io.set_input("\n"
-                 "1\n"
-                 "  1  \n"
-                 "John\n"
-                 "1\n"
-                 "John\n"
-                 "1\n"
-                 "0,2\n"
-                 " 0 , 2  \n"
-                 "\n"
-                 "\n"
-                 "4\n"
-                 "0\n"
-                 "-2\n")
+    io.set_input(
+        "\n"
+        "1\n"
+        "  1  \n"
+        "John\n"
+        "1\n"
+        "John\n"
+        "1\n"
+        "0,2\n"
+        " 0 , 2  \n"
+        "\n"
+        "\n"
+        "4\n"
+        "0\n"
+        "-2\n"
+    )
 
     heroes = ["Superman", "Batman", "Spiderman"]
     question = ChoiceQuestion("What is your favorite superhero?", heroes, "2")
@@ -81,4 +83,3 @@ def test_ask_choice(io):
         question.ask(io)
 
     assert 'Value "-2" is invalid' == str(e.value)
-
