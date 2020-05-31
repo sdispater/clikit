@@ -1,5 +1,18 @@
 # Change Log
 
+## [0.6.1] - 2020-05-31
+
+### Changed
+
+- Progress bars will now update at most every 100ms by default. This is configurable via the `min_seconds_between_redraws()` method ([#29](https://github.com/sdispater/clikit/pull/29)).
+- Progress bars and indicators now accept an `Output` instance as well as an `IO` instance. If an `IO` instance is passed the error output will be used ([#29](https://github.com/sdispater/clikit/pull/29)).
+- Slightly changed the exception trace rendering ([#30](https://github.com/sdispater/clikit/pull/30)).
+
+### Fixed
+
+- Fixed an error where choices questions accepted negative choices ([#27](https://github.com/sdispater/clikit/pull/27)).
+
+
 ## [0.6.0] - 2020-04-17
 
 ### Added
@@ -138,7 +151,8 @@
 - Fixed the progress indicator component.
 
 
-[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.6.0...master
+[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.6.1...master
+[0.6.1]: https://github.com/sdispater/tomlkit/releases/tag/0.6.1
 [0.6.0]: https://github.com/sdispater/tomlkit/releases/tag/0.6.0
 [0.5.1]: https://github.com/sdispater/tomlkit/releases/tag/0.5.1
 [0.5.0]: https://github.com/sdispater/tomlkit/releases/tag/0.5.0
