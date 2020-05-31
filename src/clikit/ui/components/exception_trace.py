@@ -10,8 +10,10 @@ import tokenize
 import traceback
 
 from clikit.api.io import IO
+from clikit.formatter.plain_formatter import PlainFormatter
 from clikit.utils._compat import PY2
 from clikit.utils._compat import PY36
+from clikit.utils._compat import decode
 from clikit.utils._compat import encode
 
 
@@ -69,7 +71,13 @@ class Highlighter(object):
         current_col = 0
         buffer = ""
         current_type = None
-        tokens = tokenize.tokenize(io.BytesIO(encode(source)).readline)
+        source_io = io.BytesIO(encode(source))
+        formatter = PlainFormatter()
+
+        def readline():
+            return encode(formatter.remove_format(decode(source_io.readline())))
+
+        tokens = tokenize.tokenize(readline)
         line = ""
         for token_info in tokens:
             token_type, token_string, start, end, _ = token_info
@@ -141,7 +149,6 @@ class Highlighter(object):
 
             buffer += token_string
             current_col = end[1]
-            current_token_info = token_info
             current_line = lineno
 
         return lines
@@ -150,16 +157,20 @@ class Highlighter(object):
         max_line_length = len(str(len(lines)))
 
         snippet_lines = []
+        marker = "  <{}>→</> ".format(self._theme[self.LINE_MARKER])
+        no_marker = "    "
         for i, line in enumerate(lines):
             if mark_line is not None:
                 if mark_line == i + 1:
-                    snippet = "  <{}>></> ".format(self._theme[self.LINE_MARKER])
+                    snippet = marker
                 else:
-                    snippet = "    "
+                    snippet = no_marker
 
             line_number = "{:>{}}".format(i + 1, max_line_length)
-            snippet += "<{}>{}</><{}>|</> {}".format(
-                "b" if mark_line == i + 1 else self._theme[self.LINE_NUMBER],
+            snippet += "<{}>{}</><{}>│</> {}".format(
+                "fg=default;options=bold"
+                if mark_line == i + 1
+                else self._theme[self.LINE_NUMBER],
                 line_number,
                 self._theme[self.LINE_NUMBER],
                 line,
@@ -289,7 +300,7 @@ class ExceptionTrace(object):
             description = solution.solution_description
             links = solution.documentation_links
 
-            description = description.replace("\n", "\n    ").strip()
+            description = description.replace("\n", "\n    ").strip(" ")
 
             self._render_line(
                 io,

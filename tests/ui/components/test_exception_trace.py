@@ -54,15 +54,15 @@ def test_render_better_error_message():
   Failed
 
   at {}:44 in test_render_better_error_message
-       40| def test_render_better_error_message():
-       41|     io = BufferedIO()
-       42| 
-       43|     try:
-    >  44|         raise Exception("Failed")
-       45|     except Exception as e:
-       46|         trace = ExceptionTrace(e)
-       47| 
-       48|     trace.render(io)
+       40│ def test_render_better_error_message():
+       41│     io = BufferedIO()
+       42│ 
+       43│     try:
+    →  44│         raise Exception("Failed")
+       45│     except Exception as e:
+       46│         trace = ExceptionTrace(e)
+       47│ 
+       48│     trace.render(io)
 """.format(
         trace._get_relative_file_path(__file__)
     )
@@ -119,26 +119,26 @@ def test_render_debug_better_error_message():
   Stack trace:
 
   1  {}:112 in test_render_debug_better_error_message
-      110\| 
-      111\|     try:
-    > 112\|         fail\(\)
-      113\|     except Exception as e:  # Exception
-      114\|         trace = ExceptionTrace\(e\)
+      110\│ 
+      111\│     try:
+    → 112\│         fail\(\)
+      113\│     except Exception as e:  # Exception
+      114\│         trace = ExceptionTrace\(e\)
 
   Exception
 
   Failed
 
   at {}:14 in fail
-       10\| from clikit.utils._compat import PY38
-       11\| 
-       12\| 
-       13\| def fail\(\):
-    >  14\|     raise Exception\("Failed"\)
-       15\| 
-       16\| 
-       17\| @pytest.mark.skipif\(PY36, reason="Legacy error messages are Python <3.6 only"\)
-       18\| def test_render_legacy_error_message\(\):
+       10\│ from clikit.utils._compat import PY38
+       11\│ 
+       12\│ 
+       13\│ def fail\(\):
+    →  14\│     raise Exception\("Failed"\)
+       15\│ 
+       16\│ 
+       17\│ @pytest.mark.skipif\(PY36, reason="Legacy error messages are Python <3.6 only"\)
+       18\│ def test_render_legacy_error_message\(\):
 """.format(
         re.escape(trace._get_relative_file_path(__file__)),
         re.escape(trace._get_relative_file_path(__file__)),
@@ -169,35 +169,35 @@ def test_render_debug_better_error_message_recursion_error():
   Stack trace:
 
   \d+  {}:162 in test_render_debug_better_error_message_recursion_error
-        160\| 
-        161\|     try:
-      > 162\|         recursion_error\(\)
-        163\|     except RecursionError as e:
-        164\|         trace = ExceptionTrace\(e\)
+        160\│ 
+        161\│     try:
+      → 162\│         recursion_error\(\)
+        163\│     except RecursionError as e:
+        164\│         trace = ExceptionTrace\(e\)
 
   ...  Previous frame repeated \d+ times
 
   \s*\d+  {}:151 in recursion_error
-        149\| 
-        150\| def recursion_error\(\):
-      > 151\|     recursion_error\(\)
-        152\| 
-        153\| 
+        149\│ 
+        150\│ def recursion_error\(\):
+      → 151\│     recursion_error\(\)
+        152\│ 
+        153\│ 
 
   RecursionError
 
   maximum recursion depth exceeded
 
   at {}:151 in recursion_error
-      147\|     assert re.match\(expected, io.fetch_output\(\)\) is not None
-      148\| 
-      149\| 
-      150\| def recursion_error\(\):
-    > 151\|     recursion_error\(\)
-      152\| 
-      153\| 
-      154\| @pytest.mark.skipif\(
-      155\|     not PY36, reason="Better error messages are only available for Python \^3\.6"
+      147\│     assert re.match\(expected, io.fetch_output\(\)\) is not None
+      148\│ 
+      149\│ 
+      150\│ def recursion_error\(\):
+    → 151\│     recursion_error\(\)
+      152\│ 
+      153\│ 
+      154\│ @pytest.mark.skipif\(
+      155\│     not PY36, reason="Better error messages are only available for Python \^3\.6"
 """.format(
         re.escape(trace._get_relative_file_path(__file__)),
         re.escape(trace._get_relative_file_path(__file__)),
@@ -232,15 +232,15 @@ def test_render_verbose_better_error_message():
   Failed
 
   at {}:14 in fail
-       10\| from clikit.utils._compat import PY38
-       11\| 
-       12\| 
-       13\| def fail\(\):
-    >  14\|     raise Exception\("Failed"\)
-       15\| 
-       16\| 
-       17\| @pytest.mark.skipif\(PY36, reason="Legacy error messages are Python <3.6 only"\)
-       18\| def test_render_legacy_error_message\(\):
+       10\│ from clikit.utils._compat import PY38
+       11\│ 
+       12\│ 
+       13\│ def fail\(\):
+    →  14\│     raise Exception\("Failed"\)
+       15\│ 
+       16\│ 
+       17\│ @pytest.mark.skipif\(PY36, reason="Legacy error messages are Python <3.6 only"\)
+       18\│ def test_render_legacy_error_message\(\):
 """.format(
         re.escape(trace._get_relative_file_path(__file__)),
         re.escape(trace._get_relative_file_path(__file__)),
@@ -316,12 +316,12 @@ def test_render_can_ignore_given_files():
   Foo
 
   at {}:3 in inner
-      1| def outer():
-      2|     def inner():
-    > 3|         raise Exception("Foo")
-      4| 
-      5|     inner()
-      6| 
+      1│ def outer():
+      2│     def inner():
+    → 3│         raise Exception("Foo")
+      4│ 
+      5│     inner()
+      6│ 
 """.format(
         trace._get_relative_file_path(__file__),
         trace._get_relative_file_path(__file__),
@@ -360,43 +360,43 @@ def test_render_shows_ignored_files_if_in_debug_mode():
   Stack trace:
 
   4  {}:351 in test_render_shows_ignored_files_if_in_debug_mode
-      349| 
-      350|     with pytest.raises(Exception) as e:
-    > 351|         call()
-      352| 
-      353|     trace = ExceptionTrace(e.value)
+      349│ 
+      350│     with pytest.raises(Exception) as e:
+    → 351│         call()
+      352│ 
+      353│     trace = ExceptionTrace(e.value)
 
   3  {}:348 in call
-      346|             outer()
-      347| 
-    > 348|         run()
-      349| 
-      350|     with pytest.raises(Exception) as e:
+      346│             outer()
+      347│ 
+    → 348│         run()
+      349│ 
+      350│     with pytest.raises(Exception) as e:
 
   2  {}:346 in run
-      344|     def call():
-      345|         def run():
-    > 346|             outer()
-      347| 
-      348|         run()
+      344│     def call():
+      345│         def run():
+    → 346│             outer()
+      347│ 
+      348│         run()
 
   1  {}:5 in outer
-      3|         raise Exception("Foo")
-      4| 
-    > 5|     inner()
-      6| 
+      3│         raise Exception("Foo")
+      4│ 
+    → 5│     inner()
+      6│ 
 
   Exception
 
   Foo
 
   at {}:3 in inner
-      1| def outer():
-      2|     def inner():
-    > 3|         raise Exception("Foo")
-      4| 
-      5|     inner()
-      6| 
+      1│ def outer():
+      2│     def inner():
+    → 3│         raise Exception("Foo")
+      4│ 
+      5│     inner()
+      6│ 
 """.format(
         trace._get_relative_file_path(__file__),
         trace._get_relative_file_path(__file__),
@@ -447,15 +447,15 @@ def test_render_supports_solutions():
   Error with solution
 
   at {}:433 in call
-      429| 
-      430|     io = BufferedIO()
-      431| 
-      432|     def call():
-    > 433|         raise CustomError("Error with solution")
-      434| 
-      435|     with pytest.raises(CustomError) as e:
-      436|         call()
-      437| 
+      429│ 
+      430│     io = BufferedIO()
+      431│ 
+      432│     def call():
+    → 433│         raise CustomError("Error with solution")
+      434│ 
+      435│     with pytest.raises(CustomError) as e:
+      436│         call()
+      437│ 
 
   • Solution Title: Solution Description
     https://example.com,
