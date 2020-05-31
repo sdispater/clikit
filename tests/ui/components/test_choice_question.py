@@ -4,7 +4,22 @@ from clikit.ui.components import ChoiceQuestion
 
 
 def test_ask_choice(io):
-    io.set_input("\n1\n  1  \nJohn\n1\nJohn\n1\n0,2\n 0 , 2  \n\n\n")
+    io.set_input(
+        "\n"
+        "1\n"
+        "  1  \n"
+        "John\n"
+        "1\n"
+        "John\n"
+        "1\n"
+        "0,2\n"
+        " 0 , 2  \n"
+        "\n"
+        "\n"
+        "4\n"
+        "0\n"
+        "-2\n"
+    )
 
     heroes = ["Superman", "Batman", "Spiderman"]
     question = ChoiceQuestion("What is your favorite superhero?", heroes, "2")
@@ -54,3 +69,17 @@ def test_ask_choice(io):
     question.set_multi_select(True)
 
     assert ["Superman", "Batman"] == question.ask(io)
+
+    question = ChoiceQuestion("What is your favourite superhero?", heroes)
+    question.set_max_attempts(1)
+
+    with pytest.raises(ValueError) as e:
+        question.ask(io)
+
+    assert 'Value "4" is invalid' == str(e.value)
+    assert "Superman" == question.ask(io)
+
+    with pytest.raises(ValueError) as e:
+        question.ask(io)
+
+    assert 'Value "-2" is invalid' == str(e.value)
