@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import time
 
 import pytest
 
@@ -8,12 +9,12 @@ from clikit.utils._compat import decode
 
 @pytest.fixture()
 def bar(io):
-    return ProgressBar(io)
+    return ProgressBar(io, min_seconds_between_redraws=0)
 
 
 @pytest.fixture()
 def ansi_bar(ansi_io):
-    return ProgressBar(ansi_io)
+    return ProgressBar(ansi_io, min_seconds_between_redraws=0)
 
 
 def test_multiple_start(ansi_bar, ansi_io):
@@ -142,7 +143,7 @@ def test_format(ansi_io):
 
 
 def test_customizations(ansi_io):
-    bar = ProgressBar(ansi_io, 10)
+    bar = ProgressBar(ansi_io, 10, 0)
     bar.set_bar_width(10)
     bar.set_bar_character("_")
     bar.set_empty_bar_character(" ")
@@ -159,7 +160,7 @@ def test_customizations(ansi_io):
 
 
 def test_display_without_start(ansi_io):
-    bar = ProgressBar(ansi_io, 50)
+    bar = ProgressBar(ansi_io, 50, 0)
     bar.display()
 
     expected = "\x0D  0/50 [>---------------------------]   0%"
@@ -169,14 +170,14 @@ def test_display_without_start(ansi_io):
 
 def test_display_with_quiet_verbosity(ansi_io):
     ansi_io.set_quiet(True)
-    bar = ProgressBar(ansi_io, 50)
+    bar = ProgressBar(ansi_io, 50, 0)
     bar.display()
 
     assert "" == ansi_io.fetch_error()
 
 
 def test_finish_without_start(ansi_io):
-    bar = ProgressBar(ansi_io, 50)
+    bar = ProgressBar(ansi_io, 50, 0)
     bar.finish()
 
     expected = "\x0D 50/50 [============================] 100%"
@@ -185,7 +186,7 @@ def test_finish_without_start(ansi_io):
 
 
 def test_percent(ansi_io):
-    bar = ProgressBar(ansi_io, 50)
+    bar = ProgressBar(ansi_io, 50, 0)
     bar.start()
     bar.display()
     bar.advance()
@@ -204,7 +205,7 @@ def test_percent(ansi_io):
 
 
 def test_overwrite_with_shorter_line(ansi_io):
-    bar = ProgressBar(ansi_io, 50)
+    bar = ProgressBar(ansi_io, 50, 0)
     bar.set_format(" %current%/%max% [%bar%] %percent:3s%%")
     bar.start()
     bar.display()
@@ -227,7 +228,7 @@ def test_overwrite_with_shorter_line(ansi_io):
 
 
 def test_set_current_progress(ansi_io):
-    bar = ProgressBar(ansi_io, 50)
+    bar = ProgressBar(ansi_io, 50, 0)
     bar.start()
     bar.display()
     bar.advance()
@@ -263,7 +264,7 @@ def test_multibyte_support(ansi_bar, ansi_io):
 
 
 def test_clear(ansi_io):
-    bar = ProgressBar(ansi_io, 50)
+    bar = ProgressBar(ansi_io, 50, 0)
     bar.start()
     bar.set_progress(25)
     bar.clear()
@@ -280,7 +281,7 @@ def test_clear(ansi_io):
 
 
 def test_percent_not_hundred_before_complete(ansi_io):
-    bar = ProgressBar(ansi_io, 200)
+    bar = ProgressBar(ansi_io, 200, 0)
     bar.start()
     bar.display()
     bar.advance(199)
@@ -299,7 +300,7 @@ def test_percent_not_hundred_before_complete(ansi_io):
 
 
 def test_non_decorated_output(io):
-    bar = ProgressBar(io, 200)
+    bar = ProgressBar(io, 200, 0)
     bar.start()
 
     for i in range(200):
@@ -327,7 +328,7 @@ def test_non_decorated_output(io):
 
 
 def test_multiline_format(ansi_io):
-    bar = ProgressBar(ansi_io, 3)
+    bar = ProgressBar(ansi_io, 3, 0)
     bar.set_format("%bar%\nfoobar")
 
     bar.start()
@@ -404,7 +405,7 @@ def test_regress_multiple_times(ansi_bar, ansi_io):
 
 
 def test_regress_below_min(ansi_io):
-    bar = ProgressBar(ansi_io, 10)
+    bar = ProgressBar(ansi_io, 10, 0)
     bar.set_progress(1)
     bar.advance(-1)
     bar.advance(-1)
@@ -420,7 +421,7 @@ def test_regress_below_min(ansi_io):
 
 
 def test_overwrite_with_section_output(ansi_io):
-    bar = ProgressBar(ansi_io.section(), 50)
+    bar = ProgressBar(ansi_io.section(), 50, 0)
     bar.start()
     bar.display()
     bar.advance()
@@ -442,8 +443,8 @@ def test_overwrite_multiple_progress_bars_with_section_outputs(ansi_io):
     output1 = ansi_io.section()
     output2 = ansi_io.section()
 
-    bar1 = ProgressBar(output1, 50)
-    bar2 = ProgressBar(output2, 50)
+    bar1 = ProgressBar(output1, 50, 0)
+    bar2 = ProgressBar(output2, 50, 0)
 
     bar1.start()
     bar2.start()
@@ -461,5 +462,27 @@ def test_overwrite_multiple_progress_bars_with_section_outputs(ansi_io):
     ]
 
     expected = "\n".join(output) + "\n"
+
+    assert expected == ansi_io.fetch_error()
+
+
+def test_min_and_max_seconds_between_redraws(ansi_bar, ansi_io):
+    ansi_bar.min_seconds_between_redraws(0.5)
+    ansi_bar.max_seconds_between_redraws(2 - 1)
+
+    ansi_bar.start()
+    ansi_bar.set_progress(1)
+    time.sleep(1)
+    ansi_bar.set_progress(2)
+    time.sleep(2)
+    ansi_bar.set_progress(3)
+
+    output = [
+        "    0 [>---------------------------]",
+        "    2 [->--------------------------]",
+        "    3 [--->------------------------]",
+    ]
+
+    expected = "\x0D" + "\x0D".join(output)
 
     assert expected == ansi_io.fetch_error()

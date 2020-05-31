@@ -48,3 +48,11 @@ class BufferedIO(IO):
 
     def clear_error(self):  # type: () -> None
         self.error_output.stream.clear()
+
+    def section(self):
+        io = self.__class__()
+        io._input = self._input
+        io._output = self._output.section()
+        io._error_output = self._error_output.section()
+
+        return io

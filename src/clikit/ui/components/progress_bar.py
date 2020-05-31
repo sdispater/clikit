@@ -5,11 +5,15 @@ import time
 import re
 import math
 
+from typing import Union
+
 from clikit.api.io import IO
 from clikit.api.io.flags import DEBUG
 from clikit.api.io.flags import VERBOSE
 from clikit.api.io.flags import VERY_VERBOSE
 from clikit.api.io.section_output import SectionOutput
+from clikit.api.io.output import Output
+from clikit.utils.terminal import Terminal
 from clikit.utils.time import format_time
 
 
@@ -36,12 +40,18 @@ class ProgressBar(object):
         "debug_nomax": " %current% [%bar%] %elapsed:6s%",
     }
 
-    def __init__(self, io, max=0):  # type: (IO, int) -> None
+    def __init__(
+        self, io, max=0, min_seconds_between_redraws=0.1
+    ):  # type: (Union[IO, Output], int, float) -> None
         """
         Constructor.
         """
+        # If we have an IO, ensure we write to the error output
+        if isinstance(io, IO):
+            io = io.error_output
 
         self._io = io
+        self._terminal = Terminal()
         self._max = 0
         self._step_width = None
         self._set_max_steps(max)
@@ -52,17 +62,25 @@ class ProgressBar(object):
         self._format_line_count = 0
         self._last_messages_length = 0
         self._should_overwrite = True
+        self._min_seconds_between_redraws = 0
+        self._max_seconds_between_redraws = 1
+        self._write_count = 0
 
-        if not self._io.error_output.supports_ansi():
+        if min_seconds_between_redraws > 0:
+            self.redraw_freq = None
+            self._min_seconds_between_redraws = min_seconds_between_redraws
+
+        if not self._io.supports_ansi():
             # Disable overwrite when output does not support ANSI codes.
             self._should_overwrite = False
 
             # Set a reasonable redraw frequency so output isn't flooded
-            self.set_redraw_frequency(max / 10)
+            self.redraw_freq = None
 
         self._messages = {}
 
         self._start_time = time.time()
+        self._last_write_time = 0
 
     def set_message(self, message, name="message"):
         self._messages[name] = message
@@ -125,7 +143,16 @@ class ProgressBar(object):
         self._internal_format = fmt
 
     def set_redraw_frequency(self, freq):
-        self.redraw_freq = max(freq, 1)
+        if self.redraw_freq is not None:
+            self.redraw_freq = max(freq, 1)
+
+    def min_seconds_between_redraws(self, freq):  # type:  (float) -> None
+        if freq > 0:
+            self.redraw_freq = None
+            self._min_seconds_between_redraws = freq
+
+    def max_seconds_between_redraws(self, freq):  # type: (float) -> None
+        self._max_seconds_between_redraws = freq
 
     def start(self, max=None):
         """
@@ -158,8 +185,11 @@ class ProgressBar(object):
         elif step < 0:
             step = 0
 
-        prev_period = int(self._step / self.redraw_freq)
-        curr_period = int(step / self.redraw_freq)
+        redraw_freq = (
+            (self._max or 10) / 10 if self.redraw_freq is None else self.redraw_freq
+        )
+        prev_period = int(self._step / redraw_freq)
+        curr_period = int(step / redraw_freq)
 
         self._step = step
 
@@ -168,7 +198,23 @@ class ProgressBar(object):
         else:
             self._percent = 0.0
 
-        if prev_period != curr_period or self._max == step:
+        time_interval = time.time() - self._last_write_time
+
+        # Draw regardless of other limits
+        if step == self._max:
+            self.display()
+
+            return
+
+        # Throttling
+        if time_interval < self._min_seconds_between_redraws:
+            return
+
+        # Draw each step period, but not too late
+        if (
+            prev_period != curr_period
+            or time_interval >= self._max_seconds_between_redraws
+        ):
             self.display()
 
     def finish(self):
@@ -275,25 +321,25 @@ class ProgressBar(object):
                     lines[i] = line.ljust(self._last_messages_length, "\x20")
 
         if self._should_overwrite:
-            if isinstance(self._io.error_output, SectionOutput):
+            if isinstance(self._io, SectionOutput):
                 lines_to_clear = (
-                    int(math.floor(len(lines) / self._io.terminal_dimensions.width))
+                    int(math.floor(len(lines) / self._terminal.width))
                     + self._format_line_count
                     + 1
                 )
-                self._io.error_output.clear(lines_to_clear)
+                self._io.clear(lines_to_clear)
             else:
                 # move back to the beginning of the progress bar before redrawing it
-                self._io.error("\x0D")
+                self._io.write("\x0D")
 
                 if self._format_line_count:
-                    self._io.error("\033[{}A".format(self._format_line_count))
+                    self._io.write("\033[{}A".format(self._format_line_count))
         elif self._step > 0:
             # move to new line
-            self._io.error_line("")
+            self._io.write_line("")
 
-        self._io.error("\n".join(lines))
-        self._io.error_output.flush()
+        self._io.write("\n".join(lines))
+        self._io.flush()
 
         self._last_messages_length = 0
 
@@ -301,6 +347,9 @@ class ProgressBar(object):
             length = len(self._io.remove_format(line))
             if length > self._last_messages_length:
                 self._last_messages_length = length
+
+        self._last_write_time = time.time()
+        self._write_count += 1
 
     def _determine_best_format(self):
         verbosity = self._io.verbosity
@@ -326,11 +375,21 @@ class ProgressBar(object):
 
         return "normal_nomax"
 
-    def _formatter_bar(self):
+    @property
+    def bar_offset(self):  # type: () -> int
         if self._max:
-            complete_bars = math.floor(self._percent * self.bar_width)
+            return math.floor(self._percent * self.bar_width)
         else:
-            complete_bars = math.floor(self.get_progress() % self.bar_width)
+            if self.redraw_freq is None:
+                return math.floor(
+                    (min(5, self.get_bar_width() / 15) * self._write_count)
+                    % self.bar_width
+                )
+
+            return math.floor(self._step % self.bar_width)
+
+    def _formatter_bar(self):
+        complete_bars = self.bar_offset
 
         display = self.get_bar_character() * int(complete_bars)
 

@@ -202,6 +202,9 @@ class IO(Formatter):
         self._output.set_formatter(formatter)
         self._error_output.set_formatter(formatter)
 
+    def supports_ansi(self):  # type: () -> bool
+        return self._output.supports_ansi()
+
     @property
     def formatter(self):  # type: () -> Formatter
         """
@@ -222,4 +225,6 @@ class IO(Formatter):
         return self._output.formatter.remove_format(string)
 
     def section(self):
-        return IO(self._input, self._output.section(), self._error_output.section())
+        return self.__class__(
+            self._input, self._output.section(), self._error_output.section()
+        )
