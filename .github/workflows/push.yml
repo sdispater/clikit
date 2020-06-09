@@ -32,7 +32,7 @@ jobs:
     - name: Install Poetry
       run: |
         curl -fsS -o get-poetry.py https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py
-        python get-poetry.py --preview -y
+        python get-poetry.py -y
         source $HOME/.poetry/env
     - name: Install dependencies
       run: |
@@ -58,7 +58,7 @@ jobs:
     - name: Install Poetry
       run: |
         curl -fsS -o get-poetry.py https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py
-        python get-poetry.py --preview -y
+        python get-poetry.py -y
         source $HOME/.poetry/env
     - name: Install dependencies
       run: |
@@ -84,7 +84,7 @@ jobs:
     - name: Install Poetry
       run: |
         Invoke-WebRequest https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py -O get-poetry.py
-        python get-poetry.py --preview -y
+        python get-poetry.py -y
         $env:Path += ";$env:Userprofile\.poetry\bin"
     - name: Install dependencies
       run: |
