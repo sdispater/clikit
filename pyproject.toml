@@ -26,7 +26,7 @@ crashtest = { version = "^0.3.0", python = "^3.6" }
 
 # The typing module is not in the stdlib in Python 2.7 and 3.4
 typing = { version = "^3.6", python = "~2.7 || ~3.4" }
-typing-extensions = { version = "^3.6", python = ">=3.5.0,<3.5.4" }
+typing-extensions = { version = "^3.6", markers = 'python_full_version >= "3.5.0" and python_full_version < "3.5.4"' }
 
 # enum34 is needed for Python 2.7
 enum34 = { version = "^1.1", python = "~2.7" }
