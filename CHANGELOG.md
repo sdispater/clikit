@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.6.2] - 2020-06-09
+
+### Fixed
+
+- Fixed an error in the package's metadata causing errors on Python 3.5.
+
+
 ## [0.6.1] - 2020-05-31
 
 ### Changed
@@ -151,7 +158,8 @@
 - Fixed the progress indicator component.
 
 
-[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.6.1...master
+[Unreleased]: https://github.com/sdispater/tomlkit/compare/0.6.2...master
+[0.6.2]: https://github.com/sdispater/tomlkit/releases/tag/0.6.2
 [0.6.1]: https://github.com/sdispater/tomlkit/releases/tag/0.6.1
 [0.6.0]: https://github.com/sdispater/tomlkit/releases/tag/0.6.0
 [0.5.1]: https://github.com/sdispater/tomlkit/releases/tag/0.5.1
