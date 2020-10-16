@@ -5,8 +5,6 @@ import os
 import platform
 import sys
 
-from codecs import encode
-
 from clikit.api.io.output_stream import OutputStream
 
 
@@ -121,7 +119,7 @@ class StreamOutputStream(OutputStream):
 
         try:
             encoding = codecs.lookup(encoding).name
-        except Exception as e:
+        except Exception:
             encoding = "utf-8"
 
         self._supports_utf8 = encoding == "utf-8"
