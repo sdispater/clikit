@@ -44,7 +44,7 @@ class CommandOption(AbstractOption):
         if not alias[:1].isalpha():
             raise ValueError("A long option alias must start with a letter.")
 
-        if not re.match("^[a-zA-Z0-9\-]+$", alias):
+        if not re.match(r"^[a-zA-Z0-9\-]+$", alias):
             raise ValueError(
                 "A long option alias must contain letters, digits and hyphens only."
             )

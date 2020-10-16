@@ -146,10 +146,10 @@ class BorderUtil:
         line = " " * indentation
         line += crossing_l_char
 
-        l = len(column_lengths)
-        for i in range(l):
+        length = len(column_lengths)
+        for i in range(length):
             line += line_char * column_lengths[i]
-            if i < l - 1:
+            if i < length - 1:
                 line += crossing_c_char
             else:
                 line += crossing_r_char

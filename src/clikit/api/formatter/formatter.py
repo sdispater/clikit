@@ -1,3 +1,6 @@
+from .style import Style
+
+
 class Formatter(object):
     """
     Formats strings.

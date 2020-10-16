@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-import os
 import time
 
-from clikit.formatter import AnsiFormatter
 from clikit.ui.components import ProgressIndicator
 
 

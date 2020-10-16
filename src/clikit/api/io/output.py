@@ -1,8 +1,7 @@
-import os
-
 from typing import Optional
 
 from clikit.api.formatter import Formatter
+from clikit.api.formatter.style import Style
 from clikit.formatter import NullFormatter
 from clikit.utils._compat import to_str
 

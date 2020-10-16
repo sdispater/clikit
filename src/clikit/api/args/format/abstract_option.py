@@ -2,7 +2,6 @@ import re
 
 from typing import Optional
 
-
 from clikit.utils._compat import basestring
 
 

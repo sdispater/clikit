@@ -1,5 +1,5 @@
-from io import BytesIO
 from io import SEEK_END
+from io import BytesIO
 
 from clikit.utils._compat import encode
 

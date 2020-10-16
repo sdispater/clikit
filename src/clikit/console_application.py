@@ -1,8 +1,10 @@
 import sys
 
+from typing import Optional
+
 from .api.application import Application as BaseApplication
-from .api.args.raw_args import RawArgs
 from .api.args.format.args_format import ArgsFormat
+from .api.args.raw_args import RawArgs
 from .api.command import Command
 from .api.command import CommandCollection
 from .api.command.exceptions import CannotAddCommandException

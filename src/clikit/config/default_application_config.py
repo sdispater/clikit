@@ -1,7 +1,9 @@
-from clikit.api.config.application_config import ApplicationConfig
-from clikit.api.args.raw_args import RawArgs
+from typing import TYPE_CHECKING
+
 from clikit.api.args.format.argument import Argument
 from clikit.api.args.format.option import Option
+from clikit.api.args.raw_args import RawArgs
+from clikit.api.config.application_config import ApplicationConfig
 from clikit.api.event import PRE_HANDLE
 from clikit.api.event import PRE_RESOLVE
 from clikit.api.event import EventDispatcher
@@ -27,6 +29,10 @@ from clikit.io.output_stream import StandardOutputStream
 from clikit.resolver.default_resolver import DefaultResolver
 from clikit.resolver.help_resolver import HelpResolver
 from clikit.ui.components import NameVersion
+
+
+if TYPE_CHECKING:
+    from clikit.api.application import Application
 
 
 class DefaultApplicationConfig(ApplicationConfig):

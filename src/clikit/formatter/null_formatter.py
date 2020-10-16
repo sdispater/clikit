@@ -1,6 +1,7 @@
 from typing import Optional
 
 from clikit.api.formatter import Formatter
+from clikit.api.formatter.style import Style
 
 
 class NullFormatter(Formatter):

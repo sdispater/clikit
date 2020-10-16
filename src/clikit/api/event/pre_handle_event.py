@@ -1,7 +1,13 @@
+from typing import TYPE_CHECKING
+
 from clikit.api.args import Args
 from clikit.api.io import IO
 
 from .event import Event
+
+
+if TYPE_CHECKING:
+    from clikit.api.command.command import Command
 
 
 class PreHandleEvent(Event):

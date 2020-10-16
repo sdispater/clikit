@@ -9,6 +9,9 @@ import sys
 import tokenize
 import traceback
 
+from typing import Any
+from typing import Tuple
+
 from clikit.api.io import IO
 from clikit.formatter.plain_formatter import PlainFormatter
 from clikit.utils._compat import PY2
@@ -139,8 +142,10 @@ class Highlighter(object):
                 # The token spans multiple lines
                 lines.append(line)
                 token_lines = token_string.split("\n")
-                for l in token_lines[1:-1]:
-                    lines.append("<{}>{}</>".format(self._theme[current_type], l))
+                for token_line in token_lines[1:-1]:
+                    lines.append(
+                        "<{}>{}</>".format(self._theme[current_type], token_line)
+                    )
 
                 current_line = end[0]
                 buffer = token_lines[-1][: end[1]]
@@ -395,7 +400,7 @@ class ExceptionTrace(object):
 
     def _render_line(
         self, io, line, new_line=False, indent=2
-    ):  # type: (IO, str) -> None
+    ):  # type: (IO, str, bool, int) -> None
         if new_line:
             io.write_line("")
 

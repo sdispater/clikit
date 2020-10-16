@@ -57,7 +57,7 @@ class Args(object):
             for option in self._fmt.get_options().values():
                 name = option.long_name
 
-                if not name in options:
+                if name not in options:
                     default = False
                     if option.accepts_value():
                         default = option.default

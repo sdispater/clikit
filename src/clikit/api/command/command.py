@@ -1,13 +1,19 @@
+from typing import TYPE_CHECKING
 from typing import List
 from typing import Optional
 
 from clikit.api.args.args import Args
-from clikit.api.args.raw_args import RawArgs
 from clikit.api.args.format.args_format import ArgsFormat
+from clikit.api.args.raw_args import RawArgs
 from clikit.api.config.command_config import CommandConfig
 from clikit.api.event import PRE_HANDLE
 from clikit.api.event import PreHandleEvent
 from clikit.api.io import IO
+
+
+if TYPE_CHECKING:
+    from clikit.api.application import Application
+    from clikit.api.command.command_collection import CommandCollection
 
 
 class Command(object):

@@ -1,5 +1,10 @@
+from typing import TYPE_CHECKING
+
 from clikit.api.args import Args
-from clikit.api.command import Command
+
+
+if TYPE_CHECKING:
+    from clikit.api.command import Command
 
 
 class ResolvedCommand(object):

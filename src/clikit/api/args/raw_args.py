@@ -24,7 +24,6 @@ class RawArgs(object):
     @property
     def option_tokens(self):  # type: () -> List[str]
         raise NotImplementedError()
-        return list(itertools.takewhile(lambda arg: arg != "--", self.tokens))
 
     def has_option_token(self, token):  # type: (str) -> bool
         raise NotImplementedError()

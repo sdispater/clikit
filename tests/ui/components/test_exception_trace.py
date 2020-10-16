@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+
 import pytest
 
 from clikit.api.io.flags import DEBUG
@@ -53,16 +54,16 @@ def test_render_better_error_message():
 
   Failed
 
-  at {}:44 in test_render_better_error_message
-       40│ def test_render_better_error_message():
-       41│     io = BufferedIO()
-       42│ 
-       43│     try:
-    →  44│         raise Exception("Failed")
-       45│     except Exception as e:
-       46│         trace = ExceptionTrace(e)
-       47│ 
-       48│     trace.render(io)
+  at {}:45 in test_render_better_error_message
+       41│ def test_render_better_error_message():
+       42│     io = BufferedIO()
+       43│ 
+       44│     try:
+    →  45│         raise Exception("Failed")
+       46│     except Exception as e:
+       47│         trace = ExceptionTrace(e)
+       48│ 
+       49│     trace.render(io)
 """.format(
         trace._get_relative_file_path(__file__)
     )
@@ -92,7 +93,7 @@ Exception
 Failed
 
 Traceback (most recent call last):
-  File "{}", line 78, in test_render_verbose_legacy
+  File "{}", line 79, in test_render_verbose_legacy
     raise Exception({})
 
 """.format(
@@ -118,27 +119,27 @@ def test_render_debug_better_error_message():
     expected = r"""^
   Stack trace:
 
-  1  {}:112 in test_render_debug_better_error_message
-      110\│ 
-      111\│     try:
-    → 112\│         fail\(\)
-      113\│     except Exception as e:  # Exception
-      114\│         trace = ExceptionTrace\(e\)
+  1  {}:113 in test_render_debug_better_error_message
+      111\│ 
+      112\│     try:
+    → 113\│         fail\(\)
+      114\│     except Exception as e:  # Exception
+      115\│         trace = ExceptionTrace\(e\)
 
   Exception
 
   Failed
 
-  at {}:14 in fail
-       10\│ from clikit.utils._compat import PY38
-       11\│ 
+  at {}:15 in fail
+       11\│ from clikit.utils._compat import PY38
        12\│ 
-       13\│ def fail\(\):
-    →  14\│     raise Exception\("Failed"\)
-       15\│ 
+       13\│ 
+       14\│ def fail\(\):
+    →  15\│     raise Exception\("Failed"\)
        16\│ 
-       17\│ @pytest.mark.skipif\(PY36, reason="Legacy error messages are Python <3.6 only"\)
-       18\│ def test_render_legacy_error_message\(\):
+       17\│ 
+       18\│ @pytest.mark.skipif\(PY36, reason="Legacy error messages are Python <3.6 only"\)
+       19\│ def test_render_legacy_error_message\(\):
 """.format(
         re.escape(trace._get_relative_file_path(__file__)),
         re.escape(trace._get_relative_file_path(__file__)),
@@ -168,36 +169,36 @@ def test_render_debug_better_error_message_recursion_error():
     expected = r"""^
   Stack trace:
 
-  \d+  {}:162 in test_render_debug_better_error_message_recursion_error
-        160\│ 
-        161\│     try:
-      → 162\│         recursion_error\(\)
-        163\│     except RecursionError as e:
-        164\│         trace = ExceptionTrace\(e\)
+  \d+  {}:163 in test_render_debug_better_error_message_recursion_error
+        161\│ 
+        162\│     try:
+      → 163\│         recursion_error\(\)
+        164\│     except RecursionError as e:
+        165\│         trace = ExceptionTrace\(e\)
 
   ...  Previous frame repeated \d+ times
 
-  \s*\d+  {}:151 in recursion_error
-        149\│ 
-        150\│ def recursion_error\(\):
-      → 151\│     recursion_error\(\)
-        152\│ 
+  \s*\d+  {}:152 in recursion_error
+        150\│ 
+        151\│ def recursion_error\(\):
+      → 152\│     recursion_error\(\)
         153\│ 
+        154\│ 
 
   RecursionError
 
   maximum recursion depth exceeded
 
-  at {}:151 in recursion_error
-      147\│     assert re.match\(expected, io.fetch_output\(\)\) is not None
-      148\│ 
+  at {}:152 in recursion_error
+      148\│     assert re.match\(expected, io.fetch_output\(\)\) is not None
       149\│ 
-      150\│ def recursion_error\(\):
-    → 151\│     recursion_error\(\)
-      152\│ 
+      150\│ 
+      151\│ def recursion_error\(\):
+    → 152\│     recursion_error\(\)
       153\│ 
-      154\│ @pytest.mark.skipif\(
-      155\│     not PY36, reason="Better error messages are only available for Python \^3\.6"
+      154\│ 
+      155\│ @pytest.mark.skipif\(
+      156\│     not PY36, reason="Better error messages are only available for Python \^3\.6"
 """.format(
         re.escape(trace._get_relative_file_path(__file__)),
         re.escape(trace._get_relative_file_path(__file__)),
@@ -224,23 +225,23 @@ def test_render_verbose_better_error_message():
     expected = r"""^
   Stack trace:
 
-  1  {}:218 in test_render_verbose_better_error_message
+  1  {}:219 in test_render_verbose_better_error_message
      fail\(\)
 
   Exception
 
   Failed
 
-  at {}:14 in fail
-       10\│ from clikit.utils._compat import PY38
-       11\│ 
+  at {}:15 in fail
+       11\│ from clikit.utils._compat import PY38
        12\│ 
-       13\│ def fail\(\):
-    →  14\│     raise Exception\("Failed"\)
-       15\│ 
+       13\│ 
+       14\│ def fail\(\):
+    →  15\│     raise Exception\("Failed"\)
        16\│ 
-       17\│ @pytest.mark.skipif\(PY36, reason="Legacy error messages are Python <3.6 only"\)
-       18\│ def test_render_legacy_error_message\(\):
+       17\│ 
+       18\│ @pytest.mark.skipif\(PY36, reason="Legacy error messages are Python <3.6 only"\)
+       19\│ def test_render_legacy_error_message\(\):
 """.format(
         re.escape(trace._get_relative_file_path(__file__)),
         re.escape(trace._get_relative_file_path(__file__)),
@@ -270,9 +271,7 @@ def test_render_debug_better_error_message_recursion_error_with_multiple_duplica
 
     trace.render(io)
 
-    expected = r"...  Previous 2 frames repeated \d+ times".format(
-        filename=re.escape(trace._get_relative_file_path(__file__)),
-    )
+    expected = r"...  Previous 2 frames repeated \d+ times"
 
     assert re.search(expected, io.fetch_output()) is not None
 
@@ -282,6 +281,7 @@ def test_render_debug_better_error_message_recursion_error_with_multiple_duplica
 )
 def test_render_can_ignore_given_files():
     import os
+
     from .helpers import outer
 
     io = BufferedIO()
@@ -336,6 +336,7 @@ def test_render_can_ignore_given_files():
 )
 def test_render_shows_ignored_files_if_in_debug_mode():
     import os
+
     from .helpers import outer
 
     io = BufferedIO()
@@ -359,26 +360,26 @@ def test_render_shows_ignored_files_if_in_debug_mode():
     expected = """
   Stack trace:
 
-  4  {}:351 in test_render_shows_ignored_files_if_in_debug_mode
-      349│ 
-      350│     with pytest.raises(Exception) as e:
-    → 351│         call()
-      352│ 
-      353│     trace = ExceptionTrace(e.value)
+  4  {}:352 in test_render_shows_ignored_files_if_in_debug_mode
+      350│ 
+      351│     with pytest.raises(Exception) as e:
+    → 352│         call()
+      353│ 
+      354│     trace = ExceptionTrace(e.value)
 
-  3  {}:348 in call
-      346│             outer()
-      347│ 
-    → 348│         run()
-      349│ 
-      350│     with pytest.raises(Exception) as e:
+  3  {}:349 in call
+      347│             outer()
+      348│ 
+    → 349│         run()
+      350│ 
+      351│     with pytest.raises(Exception) as e:
 
-  2  {}:346 in run
-      344│     def call():
-      345│         def run():
-    → 346│             outer()
-      347│ 
-      348│         run()
+  2  {}:347 in run
+      345│     def call():
+      346│         def run():
+    → 347│             outer()
+      348│ 
+      349│         run()
 
   1  {}:5 in outer
       3│         raise Exception("Foo")
@@ -412,8 +413,8 @@ def test_render_shows_ignored_files_if_in_debug_mode():
     not PY36, reason="Better error messages are only available for Python ^3.6"
 )
 def test_render_supports_solutions():
-    from crashtest.contracts.provides_solution import ProvidesSolution
     from crashtest.contracts.base_solution import BaseSolution
+    from crashtest.contracts.provides_solution import ProvidesSolution
     from crashtest.solution_providers.solution_provider_repository import (
         SolutionProviderRepository,
     )
@@ -446,16 +447,16 @@ def test_render_supports_solutions():
 
   Error with solution
 
-  at {}:433 in call
-      429│ 
-      430│     io = BufferedIO()
-      431│ 
-      432│     def call():
-    → 433│         raise CustomError("Error with solution")
-      434│ 
-      435│     with pytest.raises(CustomError) as e:
-      436│         call()
-      437│ 
+  at {}:434 in call
+      430│ 
+      431│     io = BufferedIO()
+      432│ 
+      433│     def call():
+    → 434│         raise CustomError("Error with solution")
+      435│ 
+      436│     with pytest.raises(CustomError) as e:
+      437│         call()
+      438│ 
 
   • Solution Title: Solution Description
     https://example.com,

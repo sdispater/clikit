@@ -6,11 +6,10 @@ from typing import Union
 
 from ..exceptions import NoSuchArgumentException
 from ..exceptions import NoSuchOptionException
-
 from .argument import Argument
-from .option import Option
 from .command_name import CommandName
 from .command_option import CommandOption
+from .option import Option
 
 
 class ArgsFormat(object):

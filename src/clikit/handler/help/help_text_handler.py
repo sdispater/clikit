@@ -2,7 +2,6 @@ from clikit.api.args import Args
 from clikit.api.command import Command
 from clikit.api.io import IO
 from clikit.api.resolver import CommandResolver
-
 from clikit.ui.help import ApplicationHelp
 from clikit.ui.help import CommandHelp
 

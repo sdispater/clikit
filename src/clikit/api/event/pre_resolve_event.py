@@ -1,7 +1,13 @@
+from typing import TYPE_CHECKING
+
 from clikit.api.args import RawArgs
 from clikit.api.resolver import ResolvedCommand
 
 from .event import Event
+
+
+if TYPE_CHECKING:
+    from clikit.api.application import Application
 
 
 class PreResolveEvent(Event):

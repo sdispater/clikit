@@ -3,7 +3,6 @@ import itertools
 from typing import List
 from typing import Optional
 
-
 from clikit.api.args import RawArgs
 
 from .token_parser import TokenParser

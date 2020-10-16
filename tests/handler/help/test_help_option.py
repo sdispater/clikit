@@ -5,12 +5,10 @@ from contextlib import contextmanager
 
 import pytest
 
-from clikit.api.args import Args
 from clikit.api.args.format import Argument
 from clikit.args.string_args import StringArgs
 from clikit.config.default_application_config import DefaultApplicationConfig
 from clikit.console_application import ConsoleApplication
-from clikit.io.output_stream import BufferedOutputStream
 
 
 @pytest.fixture()
