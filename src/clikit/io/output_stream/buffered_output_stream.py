@@ -7,9 +7,10 @@ class BufferedOutputStream(OutputStream):
     An output stream that writes to a buffer.
     """
 
-    def __init__(self):  # type: () -> None
+    def __init__(self, supports_utf8=True):  # type: (bool) -> None
         self._buffer = ""
         self._closed = False
+        self._supports_utf8 = supports_utf8
 
     def fetch(self):  # type: () -> str
         return self._buffer
@@ -38,6 +39,9 @@ class BufferedOutputStream(OutputStream):
         Returns whether the stream supports ANSI format codes.
         """
         return False
+
+    def supports_utf8(self):  # type: () -> bool
+        return self._supports_utf8
 
     def close(self):  # type: () -> None
         """

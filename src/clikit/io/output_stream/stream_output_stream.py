@@ -1,7 +1,11 @@
+import codecs
 import io
+import locale
 import os
 import platform
 import sys
+
+from codecs import encode
 
 from clikit.api.io.output_stream import OutputStream
 
@@ -13,6 +17,7 @@ class StreamOutputStream(OutputStream):
 
     def __init__(self, stream):  # type: (io.TextIOWrapper) -> None
         self._stream = stream
+        self._supports_utf8 = None
 
     def write(self, string):  # type: (str) -> None
         """
@@ -102,6 +107,26 @@ class StreamOutputStream(OutputStream):
             return os.isatty(self._stream.fileno())
         except io.UnsupportedOperation:
             return False
+
+    def supports_utf8(self):  # type: () -> bool
+        """
+        Returns whether the stream supports the UTF-8 encoding.
+        """
+        if self._supports_utf8 is not None:
+            return self._supports_utf8
+
+        encoding = getattr(self._stream, "encoding")
+        if encoding is None:
+            encoding = locale.getpreferredencoding(False)
+
+        try:
+            encoding = codecs.lookup(encoding).name
+        except Exception as e:
+            encoding = "utf-8"
+
+        self._supports_utf8 = encoding == "utf-8"
+
+        return self._supports_utf8
 
     def close(self):  # type: () -> None
         """
