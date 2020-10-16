@@ -21,6 +21,12 @@ class OutputStream(object):
         """
         raise NotImplementedError()
 
+    def supports_utf8(self):  # type: () -> bool
+        """
+        Returns whether the stream supports the UTF-8 encoding.
+        """
+        raise NotImplementedError()
+
     def close(self):  # type: () -> None
         """
         Closes the stream.

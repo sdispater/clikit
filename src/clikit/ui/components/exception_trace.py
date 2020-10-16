@@ -49,8 +49,14 @@ class Highlighter(object):
         __builtins__.keys() if type(__builtins__) is dict else dir(__builtins__)
     )
 
-    def __init__(self):
+    UI = {
+        False: {"arrow": ">", "delimiter": "|"},
+        True: {"arrow": "→", "delimiter": "│"},
+    }
+
+    def __init__(self, supports_utf8=True):
         self._theme = self.DEFAULT_THEME.copy()
+        self._ui = self.UI[supports_utf8]
 
     def code_snippet(self, source, line, lines_before=2, lines_after=2):
         token_lines = self.highlighted_lines(source)
@@ -162,7 +168,7 @@ class Highlighter(object):
         max_line_length = len(str(len(lines)))
 
         snippet_lines = []
-        marker = "  <{}>→</> ".format(self._theme[self.LINE_MARKER])
+        marker = "  <{}>{}</> ".format(self._theme[self.LINE_MARKER], self._ui["arrow"])
         no_marker = "    "
         for i, line in enumerate(lines):
             if mark_line is not None:
@@ -172,12 +178,13 @@ class Highlighter(object):
                     snippet = no_marker
 
             line_number = "{:>{}}".format(i + 1, max_line_length)
-            snippet += "<{}>{}</><{}>│</> {}".format(
+            snippet += "<{}>{}</><{}>{}</> {}".format(
                 "fg=default;options=bold"
                 if mark_line == i + 1
                 else self._theme[self.LINE_NUMBER],
                 line_number,
                 self._theme[self.LINE_NUMBER],
+                self._ui["delimiter"],
                 line,
             )
             snippet_lines.append(snippet)
@@ -218,7 +225,6 @@ class ExceptionTrace(object):
         self._exception = exception
         self._solution_provider_repository = solution_provider_repository
         self._exc_info = sys.exc_info()
-        self._higlighter = Highlighter()
         self._ignore = None
 
     def ignore_files_in(self, ignore):  # type: (str) -> ExceptionTrace
@@ -286,7 +292,7 @@ class ExceptionTrace(object):
             True,
         )
 
-        code_lines = self._higlighter.code_snippet(
+        code_lines = Highlighter(supports_utf8=io.output.supports_utf8()).code_snippet(
             frame.file_content, frame.lineno, 4, 4
         )
 
@@ -300,6 +306,10 @@ class ExceptionTrace(object):
         solutions = self._solution_provider_repository.get_solutions_for_exception(
             inspector.exception
         )
+        symbol = "•"
+        if not io.output.supports_utf8():
+            symbol = "*"
+
         for solution in solutions:
             title = solution.solution_title
             description = solution.solution_description
@@ -309,7 +319,8 @@ class ExceptionTrace(object):
 
             self._render_line(
                 io,
-                "<fg=blue;options=bold>• </><fg=default;options=bold>{}</>: {}{}".format(
+                "<fg=blue;options=bold>{} </><fg=default;options=bold>{}</>: {}{}".format(
+                    symbol,
                     title.rstrip("."),
                     description,
                     ",".join("\n    <fg=blue>{}</>".format(link) for link in links),
@@ -374,9 +385,9 @@ class ExceptionTrace(object):
 
                     if io.is_debug():
                         if (frame, 2, 2) not in self._FRAME_SNIPPET_CACHE:
-                            code_lines = self._higlighter.code_snippet(
-                                frame.file_content, frame.lineno,
-                            )
+                            code_lines = Highlighter(
+                                supports_utf8=io.output.supports_utf8()
+                            ).code_snippet(frame.file_content, frame.lineno,)
 
                             self._FRAME_SNIPPET_CACHE[(frame, 2, 2)] = code_lines
 

@@ -39,6 +39,7 @@ class Output(Formatter):
 
         self._verbosity = 0
         self._section_outputs = []
+        self._supports_utf8 = stream.supports_utf8()
 
     def write(
         self, string, flags=None, new_line=False
@@ -197,6 +198,9 @@ class Output(Formatter):
 
     def supports_ansi(self):  # type: () -> bool
         return self._format_output
+
+    def supports_utf8(self):  # type: () -> bool
+        return self._supports_utf8
 
     def section(self):  # type: (SectionOutput) -> SectionOutput
         from .section_output import SectionOutput

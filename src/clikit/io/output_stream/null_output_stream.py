@@ -22,6 +22,12 @@ class NullOutputStream(OutputStream):
         """
         return False
 
+    def supports_utf8(self):  # type: () -> bool
+        """
+        Returns whether the stream supports the UTF-8 encoding.
+        """
+        return False
+
     def close(self):  # type: () -> None
         """
         Closes the stream.

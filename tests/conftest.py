@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from clikit.formatter import AnsiFormatter
@@ -12,3 +14,13 @@ def io():
 @pytest.fixture()
 def ansi_io():
     return BufferedIO(formatter=AnsiFormatter(forced=True))
+
+
+@pytest.fixture
+def environ():
+    original_environ = dict(os.environ)
+
+    yield os.environ
+
+    os.environ.clear()
+    os.environ.update(original_environ)

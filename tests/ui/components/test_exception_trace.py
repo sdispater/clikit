@@ -466,3 +466,62 @@ def test_render_supports_solutions():
     )
 
     assert expected == io.fetch_output()
+
+
+@pytest.mark.skipif(
+    not PY36, reason="Better error messages are only available for Python ^3.6"
+)
+def test_render_falls_back_on_ascii_symbols():
+    from crashtest.contracts.base_solution import BaseSolution
+    from crashtest.contracts.provides_solution import ProvidesSolution
+    from crashtest.solution_providers.solution_provider_repository import (
+        SolutionProviderRepository,
+    )
+
+    class CustomError(ProvidesSolution, Exception):
+        @property
+        def solution(self):
+            solution = BaseSolution("Solution Title.", "Solution Description")
+            solution.documentation_links.append("https://example.com")
+            solution.documentation_links.append("https://example2.com")
+
+            return solution
+
+    io = BufferedIO(supports_utf8=False)
+
+    def call():
+        raise CustomError("Error with solution")
+
+    with pytest.raises(CustomError) as e:
+        call()
+
+    trace = ExceptionTrace(
+        e.value, solution_provider_repository=SolutionProviderRepository()
+    )
+
+    trace.render(io)
+
+    expected = """
+  CustomError
+
+  Error with solution
+
+  at {}:493 in call
+      489| 
+      490|     io = BufferedIO(supports_utf8=False)
+      491| 
+      492|     def call():
+    > 493|         raise CustomError("Error with solution")
+      494| 
+      495|     with pytest.raises(CustomError) as e:
+      496|         call()
+      497| 
+
+  * Solution Title: Solution Description
+    https://example.com,
+    https://example2.com
+""".format(
+        trace._get_relative_file_path(__file__),
+    )
+
+    assert expected == io.fetch_output()

@@ -16,14 +16,16 @@ class BufferedIO(IO):
     """
 
     def __init__(
-        self, input_data="", formatter=None
-    ):  # type: (str, Optional[Formatter]) -> None
+        self, input_data="", formatter=None, supports_utf8=True
+    ):  # type: (str, Optional[Formatter], bool) -> None
         if formatter is None:
             formatter = PlainFormatter()
 
         input = Input(StringInputStream(input_data))
-        output = Output(BufferedOutputStream(), formatter)
-        error_output = Output(BufferedOutputStream(), formatter)
+        output = Output(BufferedOutputStream(supports_utf8=supports_utf8), formatter)
+        error_output = Output(
+            BufferedOutputStream(supports_utf8=supports_utf8), formatter
+        )
 
         super(BufferedIO, self).__init__(input, output, error_output)
 
