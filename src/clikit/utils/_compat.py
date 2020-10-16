@@ -1,5 +1,6 @@
 import sys
 
+
 try:  # Python 2
     long = long
     unicode = unicode

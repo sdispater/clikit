@@ -1,6 +1,5 @@
 from typing import Optional
 
-
 from clikit.api.formatter import Formatter
 from clikit.api.io import IO
 from clikit.api.io import Input

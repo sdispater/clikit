@@ -1,7 +1,12 @@
 import re
 
+from typing import TYPE_CHECKING
 from typing import Any
 from typing import Optional
+
+
+if TYPE_CHECKING:
+    from clikit.api.formatter.formatter import Formatter
 
 from ._compat import basestring
 
@@ -78,7 +83,7 @@ def get_max_word_length(
         string = formatter.remove_format(string)
 
     max_length = 0
-    words = re.split("\s+", string)
+    words = re.split(r"\s+", string)
 
     for word in words:
         max_length = max(max_length, get_string_length(word))

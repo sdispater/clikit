@@ -5,6 +5,7 @@ import os
 import subprocess
 
 from typing import Any
+from typing import Callable
 
 from clikit.api.formatter import Style
 from clikit.api.io import IO
@@ -75,7 +76,8 @@ class Question(object):
         if not self._validator:
             return self._do_ask(io)
 
-        interviewer = lambda: self._do_ask(io)
+        def interviewer():
+            return self._do_ask(io)
 
         return self._validate_attempts(interviewer, io)
 

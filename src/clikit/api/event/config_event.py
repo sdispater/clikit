@@ -1,4 +1,10 @@
+from typing import TYPE_CHECKING
+
 from .event import Event
+
+
+if TYPE_CHECKING:
+    from clikit.api.config.application_config import ApplicationConfig
 
 
 class ConfigEvent(Event):

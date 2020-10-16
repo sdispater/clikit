@@ -3,8 +3,14 @@ from __future__ import unicode_literals
 import re
 import textwrap
 
+from typing import TYPE_CHECKING
+
 from clikit.api.io import IO
 from clikit.ui import Component
+
+
+if TYPE_CHECKING:
+    from clikit.ui.alignment.label_alignment import LabelAlignment
 
 
 class LabeledParagraph(Component):

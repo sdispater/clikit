@@ -1,20 +1,26 @@
 import re
 
 from contextlib import contextmanager
-
+from typing import TYPE_CHECKING
 from typing import Callable
+
 
 try:
     from typing import ContextManager
 except ImportError:
     from typing_extensions import ContextManager
+
 from typing import List
 from typing import Optional
 
+
+if TYPE_CHECKING:
+    from clikit.api.resolver.command_resolver import CommandResolver
+
+from clikit.api.command.exceptions import NoSuchCommandException
 from clikit.api.event import EventDispatcher
 from clikit.api.formatter import Style
 from clikit.api.formatter import StyleSet
-from clikit.api.command.exceptions import NoSuchCommandException
 from clikit.utils._compat import PY36
 
 from .command_config import CommandConfig

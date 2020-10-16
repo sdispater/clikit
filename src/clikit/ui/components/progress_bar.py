@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 
-import time
-import re
 import math
+import re
+import time
 
 from typing import Union
 
@@ -11,8 +11,8 @@ from clikit.api.io import IO
 from clikit.api.io.flags import DEBUG
 from clikit.api.io.flags import VERBOSE
 from clikit.api.io.flags import VERY_VERBOSE
-from clikit.api.io.section_output import SectionOutput
 from clikit.api.io.output import Output
+from clikit.api.io.section_output import SectionOutput
 from clikit.utils.terminal import Terminal
 from clikit.utils.time import format_time
 

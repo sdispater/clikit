@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from typing import List
+
 from .alignment import Alignment
 from .border_style import BorderStyle
 

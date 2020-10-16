@@ -1,6 +1,12 @@
+from typing import TYPE_CHECKING
 from typing import Optional
 
 from clikit.api.formatter import Formatter
+from clikit.api.formatter.style import Style
+
+
+if TYPE_CHECKING:
+    from clikit.ui.rectangle import Rectangle
 
 from .input import Input
 from .output import Output

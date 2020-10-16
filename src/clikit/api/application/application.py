@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from clikit.api.args.format.args_format import ArgsFormat
 from clikit.api.args.raw_args import RawArgs
 from clikit.api.command.command_collection import CommandCollection
@@ -5,6 +7,10 @@ from clikit.api.config.application_config import ApplicationConfig
 from clikit.api.io import InputStream
 from clikit.api.io import OutputStream
 from clikit.api.resolver.resolved_command import ResolvedCommand
+
+
+if TYPE_CHECKING:
+    from clikit.api.command.command import Command
 
 
 class Application:

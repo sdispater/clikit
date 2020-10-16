@@ -1,5 +1,5 @@
-from clikit.api.io import IO
 from clikit.api.config import ApplicationConfig
+from clikit.api.io import IO
 from clikit.ui import Component
 
 from .paragraph import Paragraph

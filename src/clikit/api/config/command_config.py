@@ -1,5 +1,4 @@
 from contextlib import contextmanager
-
 from typing import Any
 from typing import List
 from typing import Optional
@@ -215,13 +214,6 @@ class CommandConfig(Config):
 
     def has_sub_command_configs(self):  # type: () -> bool
         return len(self._sub_command_configs) > 0
-
-    @property
-    def default_helper_set(self):  # type: () -> HelperSet
-        if self._parent_config:
-            return self._parent_config.default_helper_set
-
-        return super(CommandConfig, self).default_helper_set
 
     @property
     def default_args_parser(self):  # type: () -> ArgsParser

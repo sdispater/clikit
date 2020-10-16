@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 from typing import Iterator
 from typing import List
 from typing import Optional
@@ -10,6 +11,10 @@ from clikit.api.resolver import ResolvedCommand
 from clikit.api.resolver.exceptions import CannotResolveCommandException
 
 from .resolve_result import ResolveResult
+
+
+if TYPE_CHECKING:
+    from clikit.api.application import Application
 
 
 class DefaultResolver(CommandResolver):
@@ -75,8 +80,6 @@ class DefaultResolver(CommandResolver):
 
             if option not in commands:
                 continue
-
-            next_command = commands.get(option)
 
         return self.process_default_sub_commands(args, current_command)
 

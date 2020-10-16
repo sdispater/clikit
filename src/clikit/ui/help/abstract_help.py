@@ -6,11 +6,10 @@ import json
 from typing import Any
 from typing import Iterable
 
-from clikit.api.args.format import Argument
 from clikit.api.args.format import ArgsFormat
+from clikit.api.args.format import Argument
 from clikit.api.args.format import Option
 from clikit.api.io import IO
-
 from clikit.ui import Component
 from clikit.ui.components import EmptyLine
 from clikit.ui.components import LabeledParagraph

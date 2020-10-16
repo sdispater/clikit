@@ -2,16 +2,14 @@ from typing import Dict
 from typing import List
 from typing import Optional
 
-
 from clikit.api.args.args import Args
 from clikit.api.args.args_parser import ArgsParser
+from clikit.api.args.exceptions import CannotParseArgsException
+from clikit.api.args.exceptions import NoSuchOptionException
 from clikit.api.args.format import ArgsFormat
 from clikit.api.args.format import Argument
 from clikit.api.args.format import CommandName
-from clikit.api.args.exceptions import CannotParseArgsException
-from clikit.api.args.exceptions import NoSuchOptionException
 from clikit.api.args.raw_args import RawArgs
-
 from clikit.utils._compat import OrderedDict
 
 
@@ -274,8 +272,8 @@ class DefaultArgsParser(ArgsParser):
     def _parse_short_option_set(
         self, name, tokens, fmt, lenient
     ):  # type: (str, List[str], ArgsFormat, bool) -> None
-        l = len(name)
-        for i in range(0, l):
+        length = len(name)
+        for i in range(0, length):
             if not fmt.has_option(name[i]):
                 raise NoSuchOptionException(name[i])
 
@@ -283,7 +281,7 @@ class DefaultArgsParser(ArgsParser):
             if option.accepts_value():
                 self._add_long_option(
                     option.long_name,
-                    None if l - 1 == i else name[i + 1 :],
+                    None if length - 1 == i else name[i + 1 :],
                     tokens,
                     fmt,
                     lenient,

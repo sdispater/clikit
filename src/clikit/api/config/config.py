@@ -57,18 +57,6 @@ class Config(object):
         return self
 
     @property
-    def helper_set(self):  # type: () -> HelperSet
-        if self._helper_set is None:
-            return self.default_helper_set
-
-        return self._helper_set
-
-    def set_helper_set(self, helper_set):  # type: (HelperSet) -> Config
-        self._helper_set = helper_set
-
-        return self
-
-    @property
     def args_parser(self):  # type: () -> ArgsParser
         if self._args_parser is None:
             return self.default_args_parser
@@ -122,10 +110,6 @@ class Config(object):
         self._handler_method = handler_method
 
         return self
-
-    @property
-    def default_helper_set(self):  # type: () -> HelperSet
-        return HelperSet()
 
     @property
     def default_args_parser(self):  # type: () -> ArgsParser

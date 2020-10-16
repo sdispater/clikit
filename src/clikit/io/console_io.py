@@ -5,8 +5,8 @@ from clikit.api.io import Input
 from clikit.api.io import Output
 from clikit.formatter import AnsiFormatter
 from clikit.formatter import PlainFormatter
-from clikit.utils.terminal import Terminal
 from clikit.ui.rectangle import Rectangle
+from clikit.utils.terminal import Terminal
 
 from .input_stream import StandardInputStream
 from .output_stream import ErrorOutputStream
