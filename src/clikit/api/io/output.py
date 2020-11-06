@@ -9,6 +9,7 @@ from .flags import DEBUG
 from .flags import NORMAL
 from .flags import VERBOSE
 from .flags import VERY_VERBOSE
+from .indent import Indent
 from .output_stream import OutputStream
 
 
@@ -40,16 +41,22 @@ class Output(Formatter):
         self._verbosity = 0
         self._section_outputs = []
         self._supports_utf8 = stream.supports_utf8()
+        self._indent = 0
 
     def write(
-        self, string, flags=None, new_line=False
-    ):  # type: (str, Optional[int], bool) -> None
+        self, string, flags=None, new_line=False, with_indent=True
+    ):  # type: (str, Optional[int], bool, bool) -> None
         """
         Writes a string to the output stream.
 
         The string is formatted before it is written to the output stream.
         """
         if self._may_write(flags):
+            if self._indent > 0 and with_indent:
+                string = "\n".join(
+                    (" " * self._indent + s) if s else s for s in string.split("\n")
+                )
+
             if self._format_output:
                 formatted = self.format(string)
             else:
@@ -202,10 +209,19 @@ class Output(Formatter):
     def supports_utf8(self):  # type: () -> bool
         return self._supports_utf8
 
-    def section(self):  # type: (SectionOutput) -> SectionOutput
+    def section(self):  # type: () -> SectionOutput
         from .section_output import SectionOutput
 
-        return SectionOutput(self._stream, self._section_outputs, self._formatter)
+        section = SectionOutput(self._stream, self._section_outputs, self._formatter)
+        section.indent(self._indent)
+
+        return section
+
+    def indent(self, indent):  # type: (int) -> Indent
+        return Indent([self], indent)
+
+    def increment_indent(self, indent):  # type: (int) -> Indent
+        return Indent([self], indent, increment=True)
 
     def _may_write(self, flags):  # type: (int) -> bool
         """

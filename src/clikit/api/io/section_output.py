@@ -48,7 +48,7 @@ class SectionOutput(Output):
         self._lines -= lines
 
         super(SectionOutput, self).write(
-            self._pop_stream_content_until_current_section(lines)
+            self._pop_stream_content_until_current_section(lines), with_indent=False
         )
 
     def overwrite(self, message):  # type: (str) -> None
@@ -56,6 +56,9 @@ class SectionOutput(Output):
         self.write_line(message)
 
     def add_content(self, content):  # type: (str) -> None
+        if self._indent > 0:
+            content = "\n".join((" " * self._indent + s) for s in content.split("\n"))
+
         for line_content in content.split("\n"):
             self._lines += (
                 math.ceil(
@@ -68,8 +71,8 @@ class SectionOutput(Output):
             self._content.append("\n")
 
     def write(
-        self, string, flags=None, new_line=False
-    ):  # type: (str, Optional[int], bool) -> None
+        self, string, flags=None, new_line=False, with_indent=True
+    ):  # type: (str, Optional[int], bool, bool) -> None
         if not self.supports_ansi() and not self._formatter.force_ansi():
             return super(SectionOutput, self).write(string, flags=flags)
 
@@ -77,8 +80,8 @@ class SectionOutput(Output):
 
         self.add_content(string)
 
-        super(SectionOutput, self).write(string, new_line=True)
-        super(SectionOutput, self).write(erased_content)
+        super(SectionOutput, self).write(string, new_line=True, with_indent=True)
+        super(SectionOutput, self).write(erased_content, with_indent=False)
 
     def _pop_stream_content_until_current_section(
         self, lines_to_clear_count=0
@@ -94,8 +97,10 @@ class SectionOutput(Output):
 
         if lines_to_clear_count > 0:
             # Move cursor up n lines
-            super(SectionOutput, self).write("\x1b[{}A".format(lines_to_clear_count))
+            super(SectionOutput, self).write(
+                "\x1b[{}A".format(lines_to_clear_count), with_indent=False
+            )
             # Erase to end of screen
-            super(SectionOutput, self).write("\x1b[0J")
+            super(SectionOutput, self).write("\x1b[0J", with_indent=False)
 
         return "".join(reversed(erased_content))

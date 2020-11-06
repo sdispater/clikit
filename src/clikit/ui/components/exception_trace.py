@@ -168,8 +168,8 @@ class Highlighter(object):
         max_line_length = len(str(len(lines)))
 
         snippet_lines = []
-        marker = "  <{}>{}</> ".format(self._theme[self.LINE_MARKER], self._ui["arrow"])
-        no_marker = "    "
+        marker = "<{}>{}</> ".format(self._theme[self.LINE_MARKER], self._ui["arrow"])
+        no_marker = "  "
         for i, line in enumerate(lines):
             if mark_line is not None:
                 if mark_line == i + 1:
@@ -240,7 +240,8 @@ class ExceptionTrace(object):
         if not PY36:
             return self._render_legacy(io)
 
-        return self._render_exception(io, self._exception)
+        with io.increment_indent(2):
+            return self._render_exception(io, self._exception)
 
     def _render_legacy(self, io):
         if hasattr(self._exception, "__traceback__"):
@@ -296,8 +297,9 @@ class ExceptionTrace(object):
             frame.file_content, frame.lineno, 4, 4
         )
 
-        for code_line in code_lines:
-            self._render_line(io, code_line)
+        with io.increment_indent(2):
+            for code_line in code_lines:
+                self._render_line(io, code_line)
 
     def _render_solution(self, io, inspector):
         if self._solution_provider_repository is None:
@@ -323,7 +325,7 @@ class ExceptionTrace(object):
                     symbol,
                     title.rstrip("."),
                     description,
-                    ",".join("\n    <fg=blue>{}</>".format(link) for link in links),
+                    ",".join("\n  <fg=blue>{}</>".format(link) for link in links),
                 ),
                 True,
             )
@@ -410,7 +412,7 @@ class ExceptionTrace(object):
                     i -= 1
 
     def _render_line(
-        self, io, line, new_line=False, indent=2
+        self, io, line, new_line=False, indent=0
     ):  # type: (IO, str, bool, int) -> None
         if new_line:
             io.write_line("")
