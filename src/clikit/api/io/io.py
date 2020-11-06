@@ -212,6 +212,9 @@ class IO(Formatter):
     def supports_ansi(self):  # type: () -> bool
         return self._output.supports_ansi()
 
+    def supports_utf8(self):  # type: () -> bool
+        return self._output.supports_utf8()
+
     @property
     def formatter(self):  # type: () -> Formatter
         """

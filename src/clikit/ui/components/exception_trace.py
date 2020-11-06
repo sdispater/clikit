@@ -97,6 +97,7 @@ class Highlighter(object):
 
             if token_type == tokenize.ENDMARKER:
                 # End of source
+                line += "<{}>{}</>".format(self._theme[current_type], buffer)
                 lines.append(line)
                 break
 
@@ -165,7 +166,7 @@ class Highlighter(object):
         return lines
 
     def line_numbers(self, lines, mark_line=None):
-        max_line_length = len(str(len(lines)))
+        max_line_length = max(3, len(str(len(lines))))
 
         snippet_lines = []
         marker = "<{}>{}</> ".format(self._theme[self.LINE_MARKER], self._ui["arrow"])
@@ -293,7 +294,7 @@ class ExceptionTrace(object):
             True,
         )
 
-        code_lines = Highlighter(supports_utf8=io.output.supports_utf8()).code_snippet(
+        code_lines = Highlighter(supports_utf8=io.supports_utf8()).code_snippet(
             frame.file_content, frame.lineno, 4, 4
         )
 
@@ -388,7 +389,7 @@ class ExceptionTrace(object):
                     if io.is_debug():
                         if (frame, 2, 2) not in self._FRAME_SNIPPET_CACHE:
                             code_lines = Highlighter(
-                                supports_utf8=io.output.supports_utf8()
+                                supports_utf8=io.supports_utf8()
                             ).code_snippet(frame.file_content, frame.lineno,)
 
                             self._FRAME_SNIPPET_CACHE[(frame, 2, 2)] = code_lines
@@ -402,11 +403,15 @@ class ExceptionTrace(object):
                                 indent=1,
                             )
                     else:
+                        try:
+                            code_line = Highlighter(
+                                supports_utf8=io.supports_utf8()
+                            ).highlighted_lines(frame.line.strip())[0]
+                        except tokenize.TokenError:
+                            code_line = frame.line.strip()
+
                         self._render_line(
-                            io,
-                            "{:>{}}  {}".format(
-                                " ", max_frame_length, frame.line.strip()
-                            ),
+                            io, "{:>{}}  {}".format(" ", max_frame_length, code_line),
                         )
 
                     i -= 1

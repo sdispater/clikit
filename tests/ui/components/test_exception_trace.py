@@ -316,12 +316,12 @@ def test_render_can_ignore_given_files():
   Foo
 
   at {}:3 in inner
-      1│ def outer():
-      2│     def inner():
-    → 3│         raise Exception("Foo")
-      4│ 
-      5│     inner()
-      6│ 
+        1│ def outer():
+        2│     def inner():
+    →   3│         raise Exception("Foo")
+        4│ 
+        5│     inner()
+        6│ 
 """.format(
         trace._get_relative_file_path(__file__),
         trace._get_relative_file_path(__file__),
@@ -382,22 +382,22 @@ def test_render_shows_ignored_files_if_in_debug_mode():
       349│         run()
 
   1  {}:5 in outer
-      3│         raise Exception("Foo")
-      4│ 
-    → 5│     inner()
-      6│ 
+        3│         raise Exception("Foo")
+        4│ 
+    →   5│     inner()
+        6│ 
 
   Exception
 
   Foo
 
   at {}:3 in inner
-      1│ def outer():
-      2│     def inner():
-    → 3│         raise Exception("Foo")
-      4│ 
-      5│     inner()
-      6│ 
+        1│ def outer():
+        2│     def inner():
+    →   3│         raise Exception("Foo")
+        4│ 
+        5│     inner()
+        6│ 
 """.format(
         trace._get_relative_file_path(__file__),
         trace._get_relative_file_path(__file__),
