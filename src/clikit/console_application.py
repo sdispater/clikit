@@ -141,7 +141,8 @@ class ConsoleApplication(BaseApplication):
                 e,
                 solution_provider_repository=self._config.solution_provider_repository,
             )
-            trace.render(io, simple=isinstance(e, CliKitException))
+            with io.indent(0):
+                trace.render(io, simple=isinstance(e, CliKitException))
 
             status_code = self.exception_to_exit_code(e)
 

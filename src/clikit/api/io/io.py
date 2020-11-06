@@ -8,6 +8,7 @@ from clikit.api.formatter.style import Style
 if TYPE_CHECKING:
     from clikit.ui.rectangle import Rectangle
 
+from .indent import Indent
 from .input import Input
 from .output import Output
 
@@ -234,3 +235,9 @@ class IO(Formatter):
         return self.__class__(
             self._input, self._output.section(), self._error_output.section()
         )
+
+    def indent(self, indent):  # type: (int) -> Indent
+        return Indent([self._output, self._error_output], indent)
+
+    def increment_indent(self, indent):  # type: (int) -> Indent
+        return Indent([self._output, self._error_output], indent, increment=True)
