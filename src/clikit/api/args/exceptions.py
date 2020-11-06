@@ -11,7 +11,7 @@ class CannotAddOptionException(RuntimeError):
         )
 
 
-class NoSuchOptionException(RuntimeError):
+class NoSuchOptionException(RuntimeError, CliKitException):
     def __init__(self, name):
         message = 'The "{}{}" option does not exist.'.format(
             "--" if len(name) > 1 else "-", name
