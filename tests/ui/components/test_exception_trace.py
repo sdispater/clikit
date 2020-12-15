@@ -226,7 +226,7 @@ def test_render_verbose_better_error_message():
   Stack trace:
 
   1  {}:219 in test_render_verbose_better_error_message
-     fail\(\)
+       fail\(\)
 
   Exception
 
@@ -306,10 +306,10 @@ def test_render_can_ignore_given_files():
   Stack trace:
 
   2  {}:297 in test_render_can_ignore_given_files
-     call()
+       call()
 
   1  {}:294 in call
-     run()
+       run()
 
   Exception
 
