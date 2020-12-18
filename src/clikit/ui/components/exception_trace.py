@@ -267,6 +267,14 @@ class ExceptionTrace(object):
         if not inspector.frames:
             return
 
+        if inspector.has_previous_exception():
+            self._render_exception(io, inspector.previous_exception)
+            io.write_line("")
+            io.write_line(
+                "During handling of the above exception, another exception occurred:"
+            )
+            io.write_line("")
+
         self._render_trace(io, inspector.frames)
 
         self._render_line(
@@ -366,20 +374,33 @@ class ExceptionTrace(object):
                             "...",
                             max_frame_length,
                             frames_message,
-                            collection.repetitions,
+                            collection.repetitions + 1,
                         ),
                         True,
                     )
 
-                    i -= len(collection) * collection.repetitions + len(collection)
+                    i -= len(collection) * (collection.repetitions + 1)
 
                 for frame in collection:
+                    relative_file_path = self._get_relative_file_path(frame.filename)
+                    relative_file_path_parts = relative_file_path.split(os.path.sep)
+                    relative_file_path = "{}".format(
+                        "<fg=default;options=dark>{}</>".format(os.path.sep).join(
+                            relative_file_path_parts[:-1]
+                            + [
+                                "<fg=default;options=bold>{}</>".format(
+                                    relative_file_path_parts[-1]
+                                )
+                            ]
+                        ),
+                    )
+
                     self._render_line(
                         io,
-                        "<fg=yellow>{:>{}}</>  <fg=default;options=bold>{}</>:<b>{}</b> in <fg=cyan>{}</>".format(
+                        "<fg=yellow>{:>{}}</>  {}<fg=default;options=dark>:</><b>{}</b> in <fg=cyan>{}</>".format(
                             i,
                             max_frame_length,
-                            self._get_relative_file_path(frame.filename),
+                            relative_file_path,
                             frame.lineno,
                             frame.function,
                         ),
@@ -403,15 +424,17 @@ class ExceptionTrace(object):
                                 indent=1,
                             )
                     else:
+                        highlighter = Highlighter(supports_utf8=io.supports_utf8())
                         try:
-                            code_line = Highlighter(
-                                supports_utf8=io.supports_utf8()
-                            ).highlighted_lines(frame.line.strip())[0]
+                            code_line = highlighter.highlighted_lines(
+                                frame.line.strip()
+                            )[0]
                         except tokenize.TokenError:
                             code_line = frame.line.strip()
 
                         self._render_line(
-                            io, "{:>{}}  {}".format(" ", max_frame_length, code_line),
+                            io,
+                            "{:>{}}    {}".format(" ", max_frame_length, code_line,),
                         )
 
                     i -= 1
