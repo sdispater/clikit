@@ -425,7 +425,10 @@ class ExceptionTrace(object):
         io.write_line("{}{}".format(indent * " ", line))
 
     def _get_relative_file_path(self, filepath):
-        cwd = os.getcwd()
+        try:
+            cwd = os.getcwd()
+        except OSError:
+            cwd = None
 
         if cwd:
             filepath = filepath.replace(cwd + os.path.sep, "")
